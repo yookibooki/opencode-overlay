@@ -1,0 +1,3 @@
+Read a file or directory from the local filesystem.
+
+Use it to inspect file contents and directory listings.

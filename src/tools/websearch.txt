@@ -1,0 +1,3 @@
+Searches the web using Exa AI and can return content from relevant websites.
+
+Use it for current or recently changing information.

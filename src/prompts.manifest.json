@@ -1,0 +1,26 @@
+{
+  "system": [
+    "anthropic",
+    "beast",
+    "codex",
+    "default",
+    "gemini",
+    "gpt",
+    "kimi",
+    "trinity"
+  ],
+  "agent": [
+    "compaction",
+    "explore",
+    "generate",
+    "summary",
+    "title"
+  ],
+  "session": [
+    "build-switch",
+    "copilot-gpt-5",
+    "max-steps",
+    "plan",
+    "plan-reminder-anthropic"
+  ]
+}

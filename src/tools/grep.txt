@@ -1,0 +1,3 @@
+Fast content search tool for regular-expression searches across files.
+
+Use it to find matching text and line numbers.

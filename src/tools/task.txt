@@ -1,0 +1,3 @@
+Launches a new subagent to handle complex, multistep tasks autonomously.
+
+Use it for slash commands and larger delegated work.

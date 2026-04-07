@@ -1,0 +1,3 @@
+Executes multiple independent tool calls concurrently to reduce latency.
+
+Use this when several tool calls can be run in parallel.

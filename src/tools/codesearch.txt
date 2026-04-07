@@ -1,0 +1,3 @@
+Searches code and documentation using Exa Code API for programming-related queries.
+
+Best for fresh library, SDK, and API context.

@@ -1,0 +1,3 @@
+Interacts with Language Server Protocol servers for code intelligence features.
+
+Supports definitions, references, hover, symbols, implementations, and call hierarchy.

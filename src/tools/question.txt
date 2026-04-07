@@ -1,0 +1,3 @@
+Use this tool to ask the user questions during execution.
+
+It is for clarifying requirements or collecting decisions.

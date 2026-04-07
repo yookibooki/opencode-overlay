@@ -1,0 +1,3 @@
+Performs exact string replacements in files.
+
+Always read the file first, and prefer editing existing files.

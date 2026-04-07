@@ -1,0 +1,3 @@
+Use this tool when planning is complete and you are ready to exit plan mode.
+
+It asks the user whether to switch to the build agent and start implementing.

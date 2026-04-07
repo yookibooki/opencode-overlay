@@ -1,0 +1,3 @@
+Makes multiple edits to a single file in one operation.
+
+Prefer this over Edit when you need several replacements in the same file.

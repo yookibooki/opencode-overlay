@@ -1,0 +1,3 @@
+Create and manage a structured task list for the current session.
+
+Use it for complex, multi-step tasks that benefit from planning.

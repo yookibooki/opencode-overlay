@@ -1,0 +1,3 @@
+Fast file pattern matching tool for finding files by name patterns.
+
+Use it when you know the directories or patterns you want to search.
