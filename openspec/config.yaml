@@ -1,0 +1,22 @@
+schema: spec-driven
+
+context: |
+  OpenCode-Thrifty is a small OpenCode plugin that trims OpenCode's context
+  surface down to plain-text overrides.
+  Tech stack: TypeScript, Bun, and OpenCode plugin hooks.
+  Maintenance goals: keep changes minimal, file-based, and easy to verify.
+  Generated artifacts: dist/, src/prompts/_snapshots/, and
+  src/prompts.manifest.json.
+
+rules:
+  proposal:
+    - Preserve the out-of-the-box install flow.
+    - Prefer file-based overrides and small, reviewable changes.
+    - Avoid adding runtime complexity unless it clearly earns its place.
+  spec:
+    - Call out any change that affects prompts, tool schemas, generated files,
+      or hook wiring.
+    - Keep requirements declarative and testable.
+  tasks:
+    - Break work into small steps that can be verified with tests or a build.
+    - Include explicit validation when runtime surfaces change.
