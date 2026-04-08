@@ -1,14 +1,9 @@
 .ralph/
-scripts/ralph/
-tasks/
 node_modules/
 src/prompts/_snapshots/
 dist/
 .opencode/
-.opencode/node_modules/
 .gitnexus
-oh-my-opencode-slim/
-skills-lock.json
 repomix-output.xml
 .ai-devkit.json
 .specify
