@@ -95,7 +95,7 @@ function replaceIntroBeforeMarker(text: string, override: string, markers: strin
     const index = text.indexOf(marker)
     if (index !== -1) {
       let start = index
-      while (start > 0 && text[start - 1] === "\n") start--
+      while (start > 0 && (text[start - 1] === "\n" || text[start - 1] === "\r")) start--
       return `${override}${text.slice(start)}`
     }
   }

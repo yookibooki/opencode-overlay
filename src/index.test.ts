@@ -63,6 +63,17 @@ test("server exposes file-based overrides and skill path injection", async () =>
     expect(skillToolOutput.description).toBe(`${skillToolOverride}\n\n## Available Skills\n- **build**: Build workflows`)
     expect(skillToolOutput.parameters).toEqual(skillToolParameters)
 
+    const skillToolCrLfOutput = {
+      description: `old intro\r\n\r\n## Available Skills\r\n- **build**: Build workflows`,
+      parameters: {},
+    }
+
+    await hooks["tool.definition"]({ toolID: "skill" }, skillToolCrLfOutput as never)
+
+    expect(skillToolCrLfOutput.description).toBe(
+      `${skillToolOverride}\r\n\r\n## Available Skills\r\n- **build**: Build workflows`,
+    )
+
     const skillToolFallback = {
       description: "intro only",
       parameters: {},
@@ -107,6 +118,16 @@ test("prompt transforms use the paired snapshot text", async () => {
     await hooks["experimental.chat.system.transform"]({}, skillSystemOutput as never)
 
     expect(skillSystemOutput.system[0]).toBe(`${skillSystemOverride}\n<available_skills>\n  <skill>\n    <name>build</name>\n  </skill>\n</available_skills>`)
+
+    const skillSystemCrLfOutput = {
+      system: [`old intro\r\n<available_skills>\r\n  <skill>\r\n    <name>build</name>\r\n  </skill>\r\n</available_skills>`],
+    }
+
+    await hooks["experimental.chat.system.transform"]({}, skillSystemCrLfOutput as never)
+
+    expect(skillSystemCrLfOutput.system[0]).toBe(
+      `${skillSystemOverride}\r\n<available_skills>\r\n  <skill>\r\n    <name>build</name>\r\n  </skill>\r\n</available_skills>`,
+    )
 
     const agentSnapshot = await fs.readFile(
       path.join(process.cwd(), "src", "prompts", "_snapshots", "agent", "explore.txt"),
