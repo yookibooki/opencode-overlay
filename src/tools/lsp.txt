@@ -1,3 +1,4 @@
-Interacts with Language Server Protocol servers for code intelligence features.
+Use language-aware code intelligence.
 
-Supports definitions, references, hover, symbols, implementations, and call hierarchy.
+Use for symbol lookup, references, definitions, diagnostics, and other language-server features when available.
+Prefer this over text search for symbol-accurate navigation.

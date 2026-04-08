@@ -1,3 +1,5 @@
-Searches code and documentation using Exa Code API for programming-related queries.
+Search the codebase semantically or structurally.
 
-Best for fresh library, SDK, and API context.
+Use when you need relevant code by concept, symbol, or behavior rather than exact text.
+Prefer grep for exact string matches.
+Prefer read once the target file is known.

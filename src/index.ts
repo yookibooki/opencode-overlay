@@ -1,16 +1,20 @@
 import fs from "fs/promises"
 import path from "path"
-import { fileURLToPath, pathToFileURL } from "url"
-
-type Manifest = {
-  system: string[]
-  agent: string[]
-  session: string[]
-}
+import { fileURLToPath } from "url"
 
 type PromptPair = {
   builtin: string
   override: string
+}
+
+type DirEntryLike = {
+  name: string
+  isFile(): boolean
+}
+
+type ServerInput = {
+  directory?: string
+  worktree?: string
 }
 
 async function readText(filePath: string) {
@@ -18,32 +22,23 @@ async function readText(filePath: string) {
 }
 
 const root = path.dirname(fileURLToPath(import.meta.url))
-const manifestPath = path.join(root, "prompts.manifest.json")
 const systemPath = path.join(root, "system.txt")
 const promptsRoot = path.join(root, "prompts")
 const snapshotsRoot = path.join(promptsRoot, "_snapshots")
+const snapshotSystemDir = path.join(snapshotsRoot, "system")
+const snapshotAgentDir = path.join(snapshotsRoot, "agent")
+const snapshotSessionDir = path.join(snapshotsRoot, "session")
 const agentOverridesDir = path.join(promptsRoot, "agent")
 const sessionOverridesDir = path.join(promptsRoot, "session")
 const toolsDir = path.join(root, "tools")
 
-function names(value: unknown) {
-  return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : []
-}
+async function listTextNames(dir: string) {
+  const entries = (await fs.readdir(dir, { withFileTypes: true }).catch(() => [])) as DirEntryLike[]
 
-async function loadManifest(): Promise<Manifest> {
-  const raw = await readText(manifestPath)
-  if (raw === undefined) return { system: [], agent: [], session: [] }
-
-  try {
-    const parsed = JSON.parse(raw) as Partial<Record<keyof Manifest, unknown>>
-    return {
-      system: names(parsed.system),
-      agent: names(parsed.agent),
-      session: names(parsed.session),
-    }
-  } catch {
-    return { system: [], agent: [], session: [] }
-  }
+  return entries
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".txt"))
+    .map((entry) => path.basename(entry.name, ".txt"))
+    .sort((a, b) => a.localeCompare(b))
 }
 
 function sortByLengthDesc(items: PromptPair[]) {
@@ -57,7 +52,8 @@ function replaceByPrefix(text: string, pairs: PromptPair[]) {
   return text
 }
 
-async function loadPairs(names: string[], snapshotDir: string, overrideDir: string) {
+async function loadPromptPairs(snapshotDir: string, overrideDir: string) {
+  const names = await listTextNames(snapshotDir)
   const pairs = await Promise.all(
     names.map(async (name) => {
       const [builtin, override] = await Promise.all([
@@ -73,10 +69,11 @@ async function loadPairs(names: string[], snapshotDir: string, overrideDir: stri
   return sortByLengthDesc(pairs.filter((pair): pair is PromptPair => pair !== undefined))
 }
 
-async function loadSystemPairs(names: string[], overrideText: string | undefined) {
+async function loadSystemPairs(overrideText: string | undefined) {
   if (overrideText === undefined) return []
 
-  const builtins = await Promise.all(names.map((name) => readText(path.join(snapshotsRoot, "system", `${name}.txt`))))
+  const names = await listTextNames(snapshotSystemDir)
+  const builtins = await Promise.all(names.map((name) => readText(path.join(snapshotSystemDir, `${name}.txt`))))
   return sortByLengthDesc(
     builtins
       .filter((text): text is string => text !== undefined)
@@ -86,60 +83,58 @@ async function loadSystemPairs(names: string[], overrideText: string | undefined
 
 async function loadDescriptions() {
   const descriptions = new Map<string, string>()
-  const entries = await fs.readdir(toolsDir, { withFileTypes: true }).catch(() => [])
+  const entries = await listTextNames(toolsDir)
 
   await Promise.all(
-    entries
-      .filter((entry) => entry.isFile() && entry.name.endsWith(".txt"))
-      .map(async (entry) => {
-        const text = await readText(path.join(toolsDir, entry.name))
-        if (text === undefined) return
-        descriptions.set(path.basename(entry.name, ".txt"), text.trimEnd())
-      }),
+    entries.map(async (name) => {
+      const text = await readText(path.join(toolsDir, `${name}.txt`))
+      if (text === undefined) return
+      descriptions.set(name, text.trimEnd())
+    }),
   )
 
   return descriptions
 }
 
-async function loadTools() {
-  const tools: Record<string, unknown> = {}
-  const entries = await fs.readdir(toolsDir, { withFileTypes: true }).catch(() => [])
+function customSkillPaths(input?: ServerInput) {
+  if (!input?.directory || !input?.worktree) return []
 
-  await Promise.all(
-    entries
-      .filter((entry) => entry.isFile() && entry.name.endsWith(".ts"))
-      .map(async (entry) => {
-        const name = path.basename(entry.name, ".ts")
-        const mod = await import(pathToFileURL(path.join(toolsDir, entry.name)).href)
-        if (!mod.default) return
-        tools[name] = mod.default
-      }),
-  )
-
-  return tools
+  return [...new Set([
+    path.join(input.directory, "skills"),
+    path.join(input.directory, "skill"),
+    path.join(input.worktree, "skills"),
+    path.join(input.worktree, "skill"),
+  ])]
 }
 
 export default {
   id: "opencode-thrifty",
-  server: async () => {
-    const manifest = await loadManifest()
+  server: async (input?: ServerInput) => {
     const systemOverride = await readText(systemPath)
-    const [systemPairs, agentPairs, sessionPairs, sessionCompaction, descriptions, tools] = await Promise.all([
-      loadSystemPairs(manifest.system, systemOverride),
-      loadPairs(manifest.agent, path.join(snapshotsRoot, "agent"), agentOverridesDir),
-      loadPairs(manifest.session, path.join(snapshotsRoot, "session"), sessionOverridesDir),
+    const [systemPairs, agentPairs, sessionPairs, sessionCompaction, descriptions] = await Promise.all([
+      loadSystemPairs(systemOverride),
+      loadPromptPairs(snapshotAgentDir, agentOverridesDir),
+      loadPromptPairs(snapshotSessionDir, sessionOverridesDir),
       readText(path.join(sessionOverridesDir, "compaction.txt")),
       loadDescriptions(),
-      loadTools(),
     ])
+    const promptPairsSorted = sortByLengthDesc([...agentPairs, ...systemPairs])
 
     return {
-      "experimental.chat.system.transform": async (_input: unknown, output: { system: string[] }) => {
-        if (systemOverride === undefined) return
-        const promptPairs = sortByLengthDesc([...agentPairs, ...systemPairs])
+      // Extend the built-in skill service with project-root folders.
+      config: async (cfg: { skills?: { paths?: string[]; urls?: string[] } }) => {
+        const skillPaths = customSkillPaths(input)
+        if (!skillPaths.length) return
 
+        const next = new Set([...(cfg.skills?.paths ?? []), ...skillPaths])
+        cfg.skills = {
+          ...(cfg.skills ?? {}),
+          paths: [...next],
+        }
+      },
+      "experimental.chat.system.transform": async (_input: unknown, output: { system: string[] }) => {
         for (let index = 0; index < output.system.length; index++) {
-          const next = replaceByPrefix(output.system[index], promptPairs)
+          const next = replaceByPrefix(output.system[index], promptPairsSorted)
           if (next !== output.system[index]) output.system[index] = next
         }
       },
@@ -164,7 +159,6 @@ export default {
         if (description === undefined) return
         output.description = description
       },
-      tool: tools,
     }
   },
 }

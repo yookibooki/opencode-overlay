@@ -1,3 +1,6 @@
-Fetches content from a specified URL and returns it in markdown, text, or HTML.
+Fetch and read a specific URL.
 
-Use it for analyzing web content.
+Use for documentation, linked pages, and direct web sources.
+Follow relevant redirects.
+Do not guess URLs.
+Fetch additional linked pages only when needed.

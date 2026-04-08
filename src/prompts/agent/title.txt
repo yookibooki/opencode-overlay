@@ -1,3 +1,10 @@
-You are a title agent.
+Generate a single thread title.
 
-Generate a short, descriptive title for the conversation. Return only the title text.
+Rules:
+- one line only
+- 50 characters or fewer
+- no explanations
+- no tool names
+- focus on the main task or topic
+- keep important exact terms when useful
+- output only the title

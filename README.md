@@ -1,12 +1,22 @@
-# opencode-thrifty
+# OpenCode-Thrifty
 
-OpenCode plugin for prompt and tool-description overrides.
+OpenCode-Thrifty is a small OpenCode plugin that trims the context surface down to plain-text overrides.
 
-This package is published as a Bun-native TypeScript package.
+## What It Changes
 
-## Use
+- Rewrites the built-in system prompt from `src/system.txt`
+- Rewrites agent and session prompts from `src/prompts/agent/*.txt` and `src/prompts/session/*.txt`
+- Sets the session compaction prompt from `src/prompts/session/compaction.txt`
+- Replaces tool descriptions from `src/tools/*.txt`
+- Adds local `skills/` and `skill/` folders from the current directory or worktree to OpenCode's skill search paths
 
-Add this to `opencode.json`:
+## Install
+
+```bash
+opencode plugin opencode-thrifty --global
+```
+
+Or add this to `~/.config/opencode/opencode.json`:
 
 ```json
 {
@@ -14,16 +24,22 @@ Add this to `opencode.json`:
 }
 ```
 
-Update the upstream snapshots with `bun run snapshots:update`.
+## Customize
 
-## Files
+- Edit the `.txt` files in `src/`
+- See `docs/customization.md` for the file map and runtime flow
+- Run `bun run snapshots:update` when upstream OpenCode prompt text changes
 
-- `src/system.txt` overrides the system prompt.
-- `src/tools/*.txt` override built-in tool descriptions.
-- `src/tools/*.ts` define special tool overrides like `skill` and `invalid`.
-- `src/prompts/session/*.txt` override plan/build reminders and compaction.
-- `src/prompts/agent/*.txt` override agent-specific prompts.
-- `src/prompts.manifest.json` lists the builtin prompt snapshots.
-- `src/prompts/_snapshots/**` stores the upstream snapshots used for exact matching.
+## Development
 
-Note: the `max-steps` reminder is currently inlined in OpenCode core and is not directly hookable.
+```bash
+bun run build
+bun run test
+bun run snapshots:update
+```
+
+## Generated Files
+
+- `dist/`
+- `src/prompts/_snapshots/`
+- `src/prompts.manifest.json`

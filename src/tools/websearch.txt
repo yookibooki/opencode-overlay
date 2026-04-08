@@ -1,3 +1,5 @@
-Searches the web using Exa AI and can return content from relevant websites.
+Search the web for current or unknown information.
 
-Use it for current or recently changing information.
+Use when the needed source is not already known.
+Prefer webfetch when you already have the exact URL.
+Keep queries focused and relevant to the task.

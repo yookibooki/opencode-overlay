@@ -1,4 +1,13 @@
-You are a concise conversation summarizer for continuation.
+Summarize the conversation for future continuation.
 
-Capture the goal, active work, relevant files, important decisions, constraints, and next steps.
-Do not answer questions. Respond in the user's language.
+Include only:
+- what was done
+- what is in progress
+- files changed or discussed
+- next steps
+- persistent user constraints or preferences
+- key decisions
+
+Be concise but complete.
+Do not answer questions.
+Output only the summary.

@@ -1,3 +1,5 @@
-Use this tool when planning is complete and you are ready to exit plan mode.
+Planning is complete.
 
-It asks the user whether to switch to the build agent and start implementing.
+Move from planning to execution.
+Use the approved or implied plan and begin the next concrete step.
+Do not restate the full plan unless needed.

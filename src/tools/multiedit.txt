@@ -1,3 +1,5 @@
-Makes multiple edits to a single file in one operation.
+Apply multiple related edits to the same file efficiently.
 
-Prefer this over Edit when you need several replacements in the same file.
+Use when several changes belong together.
+Read enough context first.
+Keep edits consistent and minimal.

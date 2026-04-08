@@ -1,3 +1,15 @@
-Launches a new subagent to handle complex, multistep tasks autonomously.
+Launch a subagent for complex or broad tasks.
 
-Use it for slash commands and larger delegated work.
+Use when:
+- the task is multi-step or open-ended
+- broad codebase exploration is needed
+- a specialized agent fits better than direct tool use
+- a slash command must be executed through a subagent
+
+Do not use when a direct read, glob, or grep is faster.
+
+When invoking:
+- choose the right subagent type
+- state whether it should research or modify
+- specify the expected final output clearly
+- resume with task_id when continuing prior work

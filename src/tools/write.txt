@@ -1,3 +1,5 @@
-Writes a file to the local filesystem.
+Create a new file.
 
-Use it only when creating or overwriting files is required.
+Use only when editing an existing file is not appropriate.
+Keep new files minimal and aligned with project conventions.
+Avoid creating files unnecessarily.

@@ -1,3 +1,7 @@
-Read a file or directory from the local filesystem.
+Read a file or directory.
 
-Use it to inspect file contents and directory listings.
+Rules:
+- use absolute paths
+- read larger chunks when you need context
+- use grep or glob first when the path or target is unknown
+- parallelize reads when multiple known files are needed

@@ -1,3 +1,4 @@
-Lists files and directories in a given path.
+List directory contents.
 
-Prefer Glob and Grep when you already know the search shape.
+Use for quick workspace inspection when you need structure, nearby files, or folder contents.
+Prefer this over bash for simple listing.

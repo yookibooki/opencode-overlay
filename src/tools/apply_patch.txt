@@ -1,3 +1,6 @@
-Use the apply_patch tool to edit files with a safe, file-oriented patch format.
+Apply a focused patch to existing files.
 
-Supports Add File, Delete File, and Update File operations.
+Use for small, precise edits.
+Prefer this over rewriting whole files when practical.
+Do not use for generated files or large scripted changes.
+Verify the patch target before applying.

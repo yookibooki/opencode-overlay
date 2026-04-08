@@ -1,3 +1,7 @@
-Use this tool to ask the user questions during execution.
+Ask the user a question only when truly blocked.
 
-It is for clarifying requirements or collecting decisions.
+Rules:
+- ask at most one short batch
+- only ask what cannot be safely inferred
+- prefer doing all non-blocked work first
+- make the question specific and actionable

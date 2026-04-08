@@ -1,3 +1,6 @@
-Create and manage a structured task list for the current session.
+Track task progress with a todo list.
 
-Use it for complex, multi-step tasks that benefit from planning.
+Use for multi-step work.
+Keep items short and concrete.
+Mark items in progress and completed as work advances.
+Do not create a todo list for trivial one-step tasks.

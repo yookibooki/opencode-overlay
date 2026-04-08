@@ -1,3 +1,12 @@
-Executes a given bash command in a persistent shell session.
+Run shell commands when a dedicated tool is not a better fit.
 
-Use workdir instead of cd when possible, and prefer specialized file tools for file operations.
+Use for:
+- git
+- builds
+- tests
+- package managers
+- process control
+- other real terminal tasks
+
+Do not use bash to read files, search code, or communicate with the user when a dedicated tool can do it better.
+Avoid commands that modify system state unless required by the task.

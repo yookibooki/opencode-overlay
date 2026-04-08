@@ -1,3 +1,5 @@
-Fast file pattern matching tool for finding files by name patterns.
+Find files by path or filename pattern.
 
-Use it when you know the directories or patterns you want to search.
+Use when the location is unknown.
+Prefer this before read when you do not know the exact path.
+Keep patterns focused.

@@ -1,3 +1,5 @@
-Executes multiple independent tool calls concurrently to reduce latency.
+Run multiple independent tool actions together.
 
-Use this when several tool calls can be run in parallel.
+Use when calls do not depend on each other.
+Prefer batching related reads, searches, or checks to reduce round trips.
+Do not batch steps that require previous outputs.

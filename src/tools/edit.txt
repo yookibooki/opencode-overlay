@@ -1,3 +1,6 @@
-Performs exact string replacements in files.
+Edit an existing file directly.
 
-Always read the file first, and prefer editing existing files.
+Use for normal file changes when apply_patch is not the best fit.
+Preserve existing style and structure.
+Change only what is needed.
+Read enough context before editing.

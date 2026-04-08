@@ -1,3 +1,5 @@
-Fast content search tool for regular-expression searches across files.
+Search file contents by exact text or regex.
 
-Use it to find matching text and line numbers.
+Use for precise matches across files.
+Prefer this over broader search when you know likely strings, symbols, or patterns.
+Keep patterns targeted.
