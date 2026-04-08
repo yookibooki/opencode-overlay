@@ -6,8 +6,11 @@ OpenCode-Thrifty is a small OpenCode plugin that trims the context surface down 
 
 - Rewrites the built-in system prompt from `src/system.txt`
 - Rewrites agent and session prompts from `src/prompts/agent/*.txt` and `src/prompts/session/*.txt`
+- Rewrites the skill preamble from `src/prompts/system/skills.txt`
 - Sets the session compaction prompt from `src/prompts/session/compaction.txt`
 - Replaces tool descriptions from `src/tools/*.txt`
+- Replaces tool schemas from `src/tools/*.json`
+- Rewrites the skill tool preamble from `src/tools/skill.txt`
 - Adds local `skills/` and `skill/` folders from the current directory or worktree to OpenCode's skill search paths
 
 ## Install
@@ -28,6 +31,8 @@ Or add this to `~/.config/opencode/opencode.json`:
 
 - Edit the `.txt` files in `src/`
 - See `docs/customization.md` for the file map and runtime flow
+- See `coverage.md` for what the plugin does and does not override
+- See `plan.md` for the maintainer direction I would follow next
 - Run `bun run snapshots:update` when upstream OpenCode prompt text changes
 
 ## Development

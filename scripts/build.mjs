@@ -24,6 +24,10 @@ async function copyFile(src, dest) {
   await fs.copyFile(src, dest)
 }
 
+function isToolAsset(entry) {
+  return entry.isFile() && (entry.name.endsWith(".txt") || entry.name.endsWith(".json"))
+}
+
 /**
  * @param {string} srcDir
  * @param {string} destDir
@@ -108,7 +112,7 @@ async function main() {
 
   await copyFile(path.join(srcRoot, "system.txt"), path.join(distRoot, "system.txt"))
   await copyTree(path.join(srcRoot, "prompts"), path.join(distRoot, "prompts"))
-  await copyTree(path.join(srcRoot, "tools"), path.join(distRoot, "tools"), (_srcPath, entry) => entry.isFile() && entry.name.endsWith(".txt"))
+  await copyTree(path.join(srcRoot, "tools"), path.join(distRoot, "tools"), (_srcPath, entry) => isToolAsset(entry))
 }
 
 main().catch((error) => {

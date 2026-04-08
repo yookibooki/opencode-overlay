@@ -7,15 +7,23 @@ OpenCode-Thrifty is intentionally file-based. Edit text files in `src/` instead 
 - `src/system.txt`
 - `src/prompts/agent/*.txt`
 - `src/prompts/session/*.txt`
+- `src/prompts/system/skills.txt`
 - `src/prompts/session/compaction.txt`
 - `src/tools/*.txt`
+- `src/tools/*.json`
 
 ## How Matching Works
 
 - The plugin scans `src/prompts/_snapshots/agent`, `src/prompts/_snapshots/session`, and `src/prompts/_snapshots/system`
-- An override only applies when the snapshot file and the local `.txt` file share the same name
+- `src/system.txt` is a shared override that is compared against every built-in system snapshot
+- Agent and session overrides apply when the snapshot file and the local `.txt` file share the same name
 - Replacement is prefix-based, so you can keep the upstream prompt tail intact if you only need to change the opening instructions
+- The longest matching snapshot wins
+- `src/prompts/system/skills.txt` edits the skill preamble while keeping OpenCode's live skill list
 - Tool descriptions are taken directly from the matching `src/tools/*.txt` file
+- Tool schemas are taken directly from the matching `src/tools/*.json` file
+- Tool schema files must contain a JSON object at the top level
+- `src/tools/skill.txt` edits the skill tool preamble while keeping OpenCode's live skill list
 
 ## Skills
 
@@ -31,4 +39,6 @@ OpenCode-Thrifty is intentionally file-based. Edit text files in `src/` instead 
 ## Notes
 
 - Missing optional files are ignored
-- The plugin remains usable with only the bundled prompt overrides and tool description files
+- The plugin remains usable with only the bundled prompt overrides and tool override files
+- See `coverage.md` for the current override map
+- See `plan.md` for the maintainer direction

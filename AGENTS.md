@@ -36,7 +36,9 @@ Main edit points:
 - `src/system.txt`
 - `src/prompts/agent/*.txt`
 - `src/prompts/session/*.txt`
+- `src/prompts/system/skills.txt`
 - `src/tools/*.txt`
+- `src/tools/*.json`
 
 For deeper customization, clone the repo into a practical local workspace and edit the text files directly:
 
@@ -98,11 +100,15 @@ Useful behavior to remember:
 - `src/system.txt` — global system override
 - `src/prompts/agent/*.txt` — agent prompt overrides
 - `src/prompts/session/*.txt` — session prompt overrides
+- `src/prompts/system/skills.txt` — skill preamble override
 - `src/prompts/session/compaction.txt` — compaction prompt override
 - `src/tools/*.txt` — tool description overrides
+- `src/tools/*.json` — tool schema overrides
 - `src/prompts/_snapshots/**` — upstream prompt snapshots used for matching
 - `src/prompts.manifest.json` — generated manifest of tracked prompt ids
 - `scripts/update-snapshots.ts` — refreshes snapshots and manifest
+- `coverage.md` — current override coverage map
+- `plan.md` — future maintainer direction
 
 ## Runtime notes
 

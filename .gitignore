@@ -16,9 +16,6 @@ pnpm-debug.log*
 .idea/
 .gitnexus
 oh-my-opencode-slim/
-AGENTS.md
-opencode.json
-opencode.jsonc
 skills-lock.json
 *.log
 *.local
