@@ -63,6 +63,15 @@ test("server exposes file-based overrides and skill path injection", async () =>
     expect(skillToolOutput.description).toBe(`${skillToolOverride}\n\n## Available Skills\n- **build**: Build workflows`)
     expect(skillToolOutput.parameters).toEqual(skillToolParameters)
 
+    const skillToolFallback = {
+      description: "intro only",
+      parameters: {},
+    }
+
+    await hooks["tool.definition"]({ toolID: "skill" }, skillToolFallback as never)
+
+    expect(skillToolFallback.description).toBe(skillToolOverride)
+
     const compaction = {} as { prompt?: string }
     await hooks["experimental.session.compacting"]({}, compaction as never)
 

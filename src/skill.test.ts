@@ -39,3 +39,25 @@ test("config hook adds extra skill roots without duplicates", async () => {
     ])
   })
 })
+
+test("config hook creates skill roots when none exist yet", async () => {
+  await withTempDir(async (root) => {
+    const worktree = path.join(root, "worktree")
+    const directory = path.join(root, "directory")
+
+    await fs.mkdir(directory, { recursive: true })
+    await fs.mkdir(worktree, { recursive: true })
+
+    const hooks = await plugin.server({ worktree, directory } as never)
+    const config = {}
+
+    await hooks.config?.(config as never)
+
+    expect((config as { skills?: { paths?: string[] } }).skills?.paths).toEqual([
+      path.join(directory, "skills"),
+      path.join(directory, "skill"),
+      path.join(worktree, "skills"),
+      path.join(worktree, "skill"),
+    ])
+  })
+})
