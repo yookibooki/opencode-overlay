@@ -106,7 +106,7 @@ Useful behavior to remember:
 - `src/prompts.manifest.json` — generated manifest of tracked prompt ids
 - `scripts/update-snapshots.ts` — refreshes snapshots and manifest
 - `coverage.md` — current override coverage map
-- `plan.md` — future maintainer direction
+- `plan.md` — maintainer direction for keeping the project small and file-based
 
 ## Runtime notes
 

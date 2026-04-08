@@ -15,7 +15,7 @@
 - Runtime discovery is filename-based: the plugin scans snapshot directories and only applies overrides when both builtin and local files exist
 - Prompt replacement is prefix-based, so the override can change the opening instructions without rewriting the whole upstream prompt
 - Missing files are treated as absent overrides, which keeps startup simple and the install path minimal
-- `config` only mutates `skills.paths`, appending local `skills/` and `skill/` folders when both `directory` and `worktree` are available
+- `config` only mutates `skills.paths`, appending local `skills/` and `skill/` folders for whichever of `directory` and `worktree` are available
 
 ## Flow
 

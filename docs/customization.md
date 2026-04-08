@@ -1,6 +1,6 @@
 # Customization
 
-OpenCode-Thrifty is intentionally file-based. Edit text files in `src/` instead of adding code when you can.
+OpenCode-Thrifty is intentionally file-based. Edit the override files in `src/` instead of adding code when you can.
 
 ## What To Edit
 
@@ -27,7 +27,7 @@ OpenCode-Thrifty is intentionally file-based. Edit text files in `src/` instead 
 
 ## Skills
 
-- If `directory` and `worktree` are available, the plugin appends `skills/` and `skill/` from both roots to OpenCode's built-in skill search paths
+- If `directory` or `worktree` is available, the plugin appends `skills/` and `skill/` from each available root to OpenCode's built-in skill search paths
 - This keeps project-local skills visible without extra configuration
 
 ## Refreshing Snapshots
@@ -39,7 +39,7 @@ OpenCode-Thrifty is intentionally file-based. Edit text files in `src/` instead 
 ## Notes
 
 - Missing optional files are ignored
-- The plugin remains usable with only the bundled prompt overrides and tool override files
+- The plugin remains usable with only the bundled `src/` override files
 - `dist/`, `src/prompts/_snapshots/`, and `src/prompts.manifest.json` are generated outputs;
   do not edit them by hand
 - See `coverage.md` for the current override map

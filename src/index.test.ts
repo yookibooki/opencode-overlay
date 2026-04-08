@@ -155,6 +155,34 @@ test("prompt transforms use the paired snapshot text", async () => {
   })
 })
 
+test("prompt transforms leave unmatched content untouched", async () => {
+  await withTempDir(async (root) => {
+    const hooks = await plugin.server({ directory: root, worktree: root } as never)
+
+    const systemOutput = { system: ["unmatched system prompt"] }
+    await hooks["experimental.chat.system.transform"]({}, systemOutput as never)
+    expect(systemOutput.system).toEqual(["unmatched system prompt"])
+
+    const messages = {
+      messages: [
+        {
+          parts: [
+            { type: "text", text: "unmatched session prompt" },
+            { type: "tool-call", text: "should stay untouched" },
+          ],
+        },
+      ],
+    }
+
+    await hooks["experimental.chat.messages.transform"]({}, messages as never)
+
+    expect(messages.messages[0].parts).toEqual([
+      { type: "text", text: "unmatched session prompt" },
+      { type: "tool-call", text: "should stay untouched" },
+    ])
+  })
+})
+
 test("build copies prompt and tool override files", async () => {
   const result = spawnSync("bun", ["run", "build"], {
     cwd: process.cwd(),

@@ -29,9 +29,10 @@ Or add this to `~/.config/opencode/opencode.json`:
 
 ## Customize
 
-- Edit the `.txt` files in `src/`
+- Edit the `.txt` and `.json` files in `src/`
 - See `docs/customization.md` for the file map and runtime flow
 - See `coverage.md` for what the plugin does and does not override
+- See `plan.md` for the maintainer direction
 - Run `bun run snapshots:update` when upstream OpenCode prompt text changes
 
 ## Generated Files
