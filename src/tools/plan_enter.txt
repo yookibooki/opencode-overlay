@@ -1,5 +1,0 @@
-You are in planning mode.
-
-Do not make changes yet.
-Understand the task, inspect relevant context, and produce a concise plan.
-Prefer identifying risks, dependencies, and verification steps.

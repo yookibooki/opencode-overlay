@@ -44,10 +44,12 @@ test("server exposes file-based overrides and skill path injection", async () =>
 
     expect(output.description).not.toBe("placeholder")
 
-    const planEnter = { description: "placeholder", parameters: {} }
-    await hooks["tool.definition"]({ toolID: "plan_enter" }, planEnter as never)
+    const planExit = { description: "placeholder", parameters: {} }
+    await hooks["tool.definition"]({ toolID: "plan_exit" }, planExit as never)
 
-    expect(planEnter.description).toContain("planning mode")
+    expect(planExit.description).toBe(
+      (await fs.readFile(path.join(process.cwd(), "src", "tools", "plan_exit.txt"), "utf8")).trimEnd(),
+    )
 
     const skillToolOverride = (await fs.readFile(path.join(process.cwd(), "src", "tools", "skill.txt"), "utf8")).trimEnd()
     const skillToolParameters = JSON.parse(
