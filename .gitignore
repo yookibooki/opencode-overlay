@@ -1,4 +1,5 @@
 .ralph/
+ralph/
 node_modules/
 src/prompts/_snapshots/
 dist/
@@ -8,13 +9,7 @@ tmp/
 .bun/
 coverage/
 .opencode/node_modules/
-.DS_Store
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 pnpm-debug.log*
-.vscode/
-.idea/
 .gitnexus
 oh-my-opencode-slim/
 skills-lock.json

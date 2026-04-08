@@ -61,3 +61,35 @@ test("config hook creates skill roots when none exist yet", async () => {
     ])
   })
 })
+
+test("config hook accepts either directory or worktree on its own", async () => {
+  await withTempDir(async (root) => {
+    const directory = path.join(root, "directory")
+    await fs.mkdir(directory, { recursive: true })
+
+    const hooks = await plugin.server({ directory } as never)
+    const config = {}
+
+    await hooks.config?.(config as never)
+
+    expect((config as { skills?: { paths?: string[] } }).skills?.paths).toEqual([
+      path.join(directory, "skills"),
+      path.join(directory, "skill"),
+    ])
+  })
+
+  await withTempDir(async (root) => {
+    const worktree = path.join(root, "worktree")
+    await fs.mkdir(worktree, { recursive: true })
+
+    const hooks = await plugin.server({ worktree } as never)
+    const config = {}
+
+    await hooks.config?.(config as never)
+
+    expect((config as { skills?: { paths?: string[] } }).skills?.paths).toEqual([
+      path.join(worktree, "skills"),
+      path.join(worktree, "skill"),
+    ])
+  })
+})

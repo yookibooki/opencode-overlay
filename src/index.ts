@@ -173,14 +173,17 @@ async function loadToolOverrides() {
 }
 
 function customSkillPaths(input?: ServerInput) {
-  if (!input?.directory || !input?.worktree) return []
+  const paths: string[] = []
 
-  return [...new Set([
-    path.join(input.directory, "skills"),
-    path.join(input.directory, "skill"),
-    path.join(input.worktree, "skills"),
-    path.join(input.worktree, "skill"),
-  ])]
+  if (input?.directory) {
+    paths.push(path.join(input.directory, "skills"), path.join(input.directory, "skill"))
+  }
+
+  if (input?.worktree) {
+    paths.push(path.join(input.worktree, "skills"), path.join(input.worktree, "skill"))
+  }
+
+  return [...new Set(paths)]
 }
 
 export default {
