@@ -1,9 +1,7 @@
 # OpenCode-Thrifty Maintainers Guide
 
 ## What this project is
-OpenCode-Thrifty is a small plugin for the OpenCode AI coding agent.
-
-It exists to reduce unnecessary context. OpenCode can send more prompt and tool context than some users want. OpenCode-Thrifty gives users a leaner prompt, lower token usage, and clearer control over what gets sent to the model.
+OpenCode-Thrifty exists to make OpenCode’s context layer smaller, clearer, and easier to control. It reduces unnecessary prompt and tool context, helps save tokens, and keeps customization simple through user-editable files.
 
 ## Project goal
 Keep this project small, practical, and easy to understand.
