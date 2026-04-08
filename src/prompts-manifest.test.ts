@@ -3,6 +3,7 @@ import fs from "fs/promises"
 import path from "path"
 
 type PromptManifest = {
+  system: string[]
   agent: string[]
   session: string[]
 }
@@ -23,13 +24,15 @@ test("prompt manifest tracks snapshot-paired local overrides", async () => {
     await fs.readFile(path.join(root, "src", "prompts.manifest.json"), "utf8"),
   ) as PromptManifest
 
-  const [agentSnapshots, sessionSnapshots, agentOverrides, sessionOverrides] = await Promise.all([
+  const [systemSnapshots, agentSnapshots, sessionSnapshots, agentOverrides, sessionOverrides] = await Promise.all([
+    listPromptNames(path.join(promptsRoot, "_snapshots", "system")),
     listPromptNames(path.join(promptsRoot, "_snapshots", "agent")),
     listPromptNames(path.join(promptsRoot, "_snapshots", "session")),
     listPromptNames(path.join(promptsRoot, "agent")),
     listPromptNames(path.join(promptsRoot, "session")),
   ])
 
+  expect(systemSnapshots).toEqual(manifest.system)
   expect(agentSnapshots).toEqual(manifest.agent)
   expect(sessionSnapshots).toEqual(manifest.session)
 

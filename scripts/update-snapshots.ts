@@ -68,8 +68,7 @@ function sortNames(names: string[]) {
   return [...new Set(names)].sort((a, b) => a.localeCompare(b))
 }
 
-async function main() {
-  const tree = await fetchTree()
+export function buildSnapshotManifest(tree: TreeEntry[]): Manifest {
   const paths = new Set(tree.filter((entry) => entry.type === "blob").map((entry) => entry.path))
 
   const system = sortNames(systemNames.filter((name) => paths.has(`${sessionPromptPrefix}${name}.txt`)))
@@ -89,7 +88,13 @@ async function main() {
       .map((entry) => path.basename(entry.path, ".txt")),
   )
 
-  const manifest: Manifest = { system, agent, session }
+  return { system, agent, session }
+}
+
+async function main() {
+  const tree = await fetchTree()
+  const manifest = buildSnapshotManifest(tree)
+  const { system, session, agent } = manifest
 
   await fs.rm(snapshotRoot, { recursive: true, force: true })
 
@@ -119,4 +124,6 @@ async function main() {
   await fs.writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`)
 }
 
-await main()
+if (import.meta.main) {
+  await main()
+}

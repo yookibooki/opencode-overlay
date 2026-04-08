@@ -19,6 +19,21 @@ async function ensureDir(dir) {
   await fs.mkdir(dir, { recursive: true })
 }
 
+async function requireDirectory(dir, label) {
+  try {
+    const stat = await fs.stat(dir)
+    if (!stat.isDirectory()) {
+      throw new Error(`${label} must be a directory: ${dir}`)
+    }
+  } catch (error) {
+    if (error instanceof Error && Reflect.get(error, "code") === "ENOENT") {
+      throw new Error(`${label} is missing: ${dir}`)
+    }
+
+    throw error
+  }
+}
+
 async function copyFile(src, dest) {
   await ensureDir(path.dirname(dest))
   await fs.copyFile(src, dest)
@@ -34,9 +49,7 @@ function isToolAsset(entry) {
  * @param {(srcPath: string, entry: DirEntryLike) => boolean} [shouldCopy]
  */
 async function copyTree(srcDir, destDir, shouldCopy) {
-  const entries = /** @type {DirEntryLike[]} */ (
-    await fs.readdir(srcDir, { withFileTypes: true }).catch(() => [])
-  )
+  const entries = /** @type {DirEntryLike[]} */ (await fs.readdir(srcDir, { withFileTypes: true }))
   entries.sort((a, b) => a.name.localeCompare(b.name))
 
   await ensureDir(destDir)
@@ -111,6 +124,13 @@ async function main() {
   runTypeDeclarations()
 
   await copyFile(path.join(srcRoot, "system.txt"), path.join(distRoot, "system.txt"))
+  await requireDirectory(path.join(srcRoot, "prompts"), "Source prompts tree")
+  await Promise.all([
+    requireDirectory(path.join(srcRoot, "prompts", "_snapshots"), "Prompt snapshots tree"),
+    requireDirectory(path.join(srcRoot, "prompts", "_snapshots", "system"), "System prompt snapshots"),
+    requireDirectory(path.join(srcRoot, "prompts", "_snapshots", "agent"), "Agent prompt snapshots"),
+    requireDirectory(path.join(srcRoot, "prompts", "_snapshots", "session"), "Session prompt snapshots"),
+  ])
   await copyTree(path.join(srcRoot, "prompts"), path.join(distRoot, "prompts"))
   await copyTree(path.join(srcRoot, "tools"), path.join(distRoot, "tools"), (_srcPath, entry) => isToolAsset(entry))
 }

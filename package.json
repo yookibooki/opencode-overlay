@@ -19,7 +19,9 @@
   "scripts": {
     "clean": "bun run scripts/clean.mjs",
     "build": "bun run scripts/build.mjs",
-    "check": "tsc --noEmit",
+    "check": "bun run check:src && bun run check:scripts",
+    "check:src": "tsc --noEmit -p tsconfig.json",
+    "check:scripts": "tsc --noEmit -p tsconfig.scripts.json",
     "prepare": "bun run build",
     "prepublishOnly": "bun run build",
     "test": "bun run scripts/test.mjs",

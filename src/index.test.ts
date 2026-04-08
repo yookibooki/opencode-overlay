@@ -101,16 +101,20 @@ test("prompt transforms use the paired snapshot text", async () => {
   await withTempDir(async (root) => {
     const hooks = await plugin.server({ directory: root, worktree: root } as never)
 
-    const systemSnapshot = await fs.readFile(
-      path.join(process.cwd(), "src", "prompts", "_snapshots", "system", "default.txt"),
-      "utf8",
-    )
     const systemOverride = await fs.readFile(path.join(process.cwd(), "src", "system.txt"), "utf8")
-    const systemOutput = { system: [systemSnapshot] }
+    const systemSnapshotDir = path.join(process.cwd(), "src", "prompts", "_snapshots", "system")
+    const systemSnapshots = (await fs.readdir(systemSnapshotDir, { withFileTypes: true })).filter(
+      (entry) => entry.isFile() && entry.name.endsWith(".txt"),
+    )
 
-    await hooks["experimental.chat.system.transform"]({}, systemOutput as never)
+    for (const entry of systemSnapshots) {
+      const systemSnapshot = await fs.readFile(path.join(systemSnapshotDir, entry.name), "utf8")
+      const systemOutput = { system: [systemSnapshot] }
 
-    expect(systemOutput.system[0]).toBe(systemOverride)
+      await hooks["experimental.chat.system.transform"]({}, systemOutput as never)
+
+      expect(systemOutput.system[0]).toBe(systemOverride)
+    }
 
     const skillSystemOverride = await fs.readFile(path.join(process.cwd(), "src", "prompts", "system", "skills.txt"), "utf8")
     const skillSystemOutput = {
