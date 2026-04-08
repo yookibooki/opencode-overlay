@@ -39,6 +39,7 @@ Or add this to `~/.config/opencode/opencode.json`:
 - `dist/`
 - `src/prompts/_snapshots/`
 - `src/prompts.manifest.json`
+- These are generated outputs; regenerate them instead of editing them by hand.
 
 ## Development
 
