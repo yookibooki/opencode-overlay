@@ -25,3 +25,4 @@ skills-lock.json
 *.tsbuildinfo
 repomix-output.xml
 .ai-devkit.json
+.specify
