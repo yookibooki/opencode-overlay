@@ -90,7 +90,7 @@ Useful behavior to remember:
 - Preserve the out-of-the-box install flow
 - Preserve the file-based customization model
 - Do not move user-editable behavior into code unless necessary
-- Prefer learning from `@oh-my-opencode-slim/`, but adapt its ideas to this project instead of copying blindly
+- Prefer learning from `/home/dev/gitops/oh-my-opencode-slim/`, but adapt its ideas to this project instead of copying blindly
 
 ## File map
 
@@ -152,7 +152,7 @@ These are useful for understanding upstream behavior, but they are reference-onl
 - OpenCode repo: `https://github.com/anomalyco/opencode`
 - Plugins documentation in `/home/dev/gitops/opencode/packages/web/src/content/docs/plugins.mdx`
 - OpenCode plugin docs: `https://opencode.ai/docs/plugins/`
-- `@oh-my-opencode-slim/` as a design reference
+- `/home/dev/gitops/oh-my-opencode-slim/` as a design reference
 
 Read from them. Learn from them. Do not edit them.
 
