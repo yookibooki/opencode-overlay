@@ -1,81 +1,39 @@
 ---
 phase: testing
 title: Testing Strategy
-description: Define testing approach, test cases, and quality assurance
+description: Project-specific testing approach and verification checklist
 ---
 
 # Testing Strategy
 
-## Test Coverage Goals
-**What level of testing do we aim for?**
+## Coverage Goals
 
-- Unit test coverage target (default: 100% of new/changed code)
-- Integration test scope (critical paths + error handling)
-- End-to-end test scenarios (key user journeys)
-- Alignment with requirements/design acceptance criteria
+- Cover every changed runtime path with a focused test.
+- Keep the suite fast enough to run on every maintenance pass.
+- Prefer direct file-based fixtures over heavy mocking when practical.
 
 ## Unit Tests
-**What individual components need testing?**
 
-### Component/Module 1
-- [ ] Test case 1: [Description] (covers scenario / branch)
-- [ ] Test case 2: [Description] (covers edge case / error handling)
-- [ ] Additional coverage: [Description]
+### Core plugin behavior
 
-### Component/Module 2
-- [ ] Test case 1: [Description]
-- [ ] Test case 2: [Description]
-- [ ] Additional coverage: [Description]
+- `src/index.test.ts`: config hook, prompt rewrites, compaction prompt, tool overrides, build copy verification.
+- `src/index.read-errors.test.ts`: missing-file and real-error handling for optional reads and directory scans.
+- `src/prompts-manifest.test.ts`: generated snapshot manifest stays aligned with the tracked overrides.
 
 ## Integration Tests
-**How do we test component interactions?**
 
-- [ ] Integration scenario 1
-- [ ] Integration scenario 2
-- [ ] API endpoint tests
-- [ ] Integration scenario 3 (failure mode / rollback)
+- Run `bun run build` and confirm copied assets match `src/`.
+- Run `bun run test` after touching prompt or tool assets.
+- Re-run `bun run snapshots:update` when upstream snapshots change.
 
-## End-to-End Tests
-**What user flows need validation?**
+## Manual Verification
 
-- [ ] User flow 1: [Description]
-- [ ] User flow 2: [Description]
-- [ ] Critical path testing
-- [ ] Regression of adjacent features
+- `bun run check`
+- `bun run test`
+- `bun run build`
 
-## Test Data
-**What data do we use for testing?**
+## Notes
 
-- Test fixtures and mocks
-- Seed data requirements
-- Test database setup
-
-## Test Reporting & Coverage
-**How do we verify and communicate test results?**
-
-- Coverage commands and thresholds (`npm run test -- --coverage`)
-- Coverage gaps (files/functions below 100% and rationale)
-- Links to test reports or dashboards
-- Manual testing outcomes and sign-off
-
-## Manual Testing
-**What requires human validation?**
-
-- UI/UX testing checklist (include accessibility)
-- Browser/device compatibility
-- Smoke tests after deployment
-
-## Performance Testing
-**How do we validate performance?**
-
-- Load testing scenarios
-- Stress testing approach
-- Performance benchmarks
-
-## Bug Tracking
-**How do we manage issues?**
-
-- Issue tracking process
-- Bug severity levels
-- Regression testing strategy
-
+- Keep new tests small and deterministic.
+- Favor the real filesystem and temp directories for plugin-path behavior.
+- Mock only when the behavior under test is otherwise awkward to isolate.

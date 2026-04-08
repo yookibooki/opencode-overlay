@@ -26,6 +26,7 @@ Or add this to `~/.config/opencode/opencode.json`:
 - Replaces tool schemas from `src/tools/*.json`
 - Rewrites the skill tool preamble from `src/tools/skill.txt`
 - Adds local `skills/` and `skill/` folders from the current directory or worktree to OpenCode's skill search paths
+- Missing optional files and directories are ignored; unreadable paths still fail fast
 
 ## Customize
 
@@ -45,6 +46,7 @@ Or add this to `~/.config/opencode/opencode.json`:
 ## Development
 
 ```bash
+bun run check
 bun run build
 bun run test
 bun run snapshots:update

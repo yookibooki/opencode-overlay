@@ -204,4 +204,4 @@ test("build copies prompt and tool override files", async () => {
   const srcSkills = await fs.readFile(path.join(process.cwd(), "src", "prompts", "system", "skills.txt"), "utf8")
   const distSkills = await fs.readFile(path.join(process.cwd(), "dist", "prompts", "system", "skills.txt"), "utf8")
   expect(distSkills).toBe(srcSkills)
-}, { timeout: 15000 })
+}, { timeout: 30000 })

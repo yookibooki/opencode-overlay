@@ -1,60 +1,42 @@
 ---
 phase: planning
 title: Project Planning & Task Breakdown
-description: Break down work into actionable tasks and estimate timeline
+description: Maintenance-oriented planning notes for this repo
 ---
 
 # Project Planning & Task Breakdown
 
-## Milestones
-**What are the major checkpoints?**
+## Maintenance Milestones
 
-- [ ] Milestone 1: [Description]
-- [ ] Milestone 2: [Description]
-- [ ] Milestone 3: [Description]
+- Understand the repo layout and current override strategy.
+- Make one small, high-value change at a time.
+- Verify with check, test, build, and diagnostics.
+- Stop when only low-value churn remains.
 
 ## Task Breakdown
-**What specific work needs to be done?**
 
-### Phase 1: Foundation
-- [ ] Task 1.1: [Description]
-- [ ] Task 1.2: [Description]
+### Phase 1: Inspect
 
-### Phase 2: Core Features
-- [ ] Task 2.1: [Description]
-- [ ] Task 2.2: [Description]
+- Review `src/`, `scripts/`, and top-level docs.
+- Confirm generated files are treated as generated.
 
-### Phase 3: Integration & Polish
-- [ ] Task 3.1: [Description]
-- [ ] Task 3.2: [Description]
+### Phase 2: Improve
+
+- Fix correctness or clarity issues with minimal diffs.
+- Keep changes aligned with the file-based customization model.
+
+### Phase 3: Verify
+
+- Run typecheck, tests, build, and diagnostics on changed files.
+- Check that docs match the runtime behavior.
 
 ## Dependencies
-**What needs to happen in what order?**
 
-- Task dependencies and blockers
-- External dependencies (APIs, services, etc.)
-- Team/resource dependencies
-
-## Timeline & Estimates
-**When will things be done?**
-
-- Estimated effort per task/phase
-- Target dates for milestones
-- Buffer for unknowns
+- Upstream OpenCode prompt changes depend on `bun run snapshots:update`.
+- Build and test expectations depend on the Bun toolchain.
 
 ## Risks & Mitigation
-**What could go wrong?**
 
-- Technical risks
-- Resource risks
-- Dependency risks
-- Mitigation strategies
-
-## Resources Needed
-**What do we need to succeed?**
-
-- Team members and roles
-- Tools and services
-- Infrastructure
-- Documentation/knowledge
-
+- Risk: broad rewrites add complexity. Mitigation: keep patches small.
+- Risk: docs drift from runtime behavior. Mitigation: update docs in the same change.
+- Risk: generated assets get edited by hand. Mitigation: regenerate them instead.

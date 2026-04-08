@@ -23,7 +23,16 @@ type ServerInput = {
 }
 
 async function readText(filePath: string) {
-  return fs.readFile(filePath, "utf8").catch(() => undefined)
+  try {
+    return await fs.readFile(filePath, "utf8")
+  } catch (error) {
+    if (isMissingFileError(error)) return undefined
+    throw error
+  }
+}
+
+function isMissingFileError(error: unknown) {
+  return typeof error === "object" && error !== null && Reflect.get(error, "code") === "ENOENT"
 }
 
 async function readJsonObject(filePath: string) {
@@ -62,7 +71,15 @@ const skillSystemMarkers = ["<available_skills>", noSkillsMarker]
 const skillToolMarkers = ["## Available Skills", noSkillsMarker]
 
 async function listFileBaseNames(dir: string, extensions: string[]) {
-  const entries = (await fs.readdir(dir, { withFileTypes: true }).catch(() => [])) as DirEntryLike[]
+  let entries: DirEntryLike[]
+
+  try {
+    entries = (await fs.readdir(dir, { withFileTypes: true })) as DirEntryLike[]
+  } catch (error) {
+    if (isMissingFileError(error)) return []
+    throw error
+  }
+
   const names = new Set<string>()
 
   for (const entry of entries) {

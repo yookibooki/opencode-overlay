@@ -38,7 +38,7 @@ OpenCode-Thrifty is intentionally file-based. Edit the override files in `src/` 
 
 ## Notes
 
-- Missing optional files are ignored
+- Missing optional files and directories are ignored; unreadable paths still fail fast
 - The plugin remains usable with only the bundled `src/` override files
 - `dist/`, `src/prompts/_snapshots/`, and `src/prompts.manifest.json` are generated outputs;
   do not edit them by hand
