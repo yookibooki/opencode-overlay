@@ -1,4 +1,5 @@
 node_modules/
+src/prompts/_snapshots/
 dist/
 .opencode/
 tmp/
@@ -25,3 +26,4 @@ skills-lock.json
 *.swo
 *.tmp
 *.tsbuildinfo
+repomix-output.xml
