@@ -1,5 +1,8 @@
 .ralph/
-ralph/
+scripts/ralph/
+.openspec/
+config.yaml
+tasks/
 node_modules/
 src/prompts/_snapshots/
 dist/
