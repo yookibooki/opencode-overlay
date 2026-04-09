@@ -5,7 +5,13 @@ import os from "os"
 import path from "path"
 import { toJSONSchema } from "zod"
 
-import plugin from "./index"
+import plugin, {
+  type ChatMessagesOutput,
+  type ChatSystemOutput,
+  type PluginConfig,
+  type SessionCompactingOutput,
+  type ToolDefinitionOutput,
+} from "./index"
 
 async function withTempDir<T>(fn: (root: string) => Promise<T>) {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), "opencode-thrifty-"))
@@ -24,14 +30,14 @@ test("server exposes file-based overrides and skill path injection", async () =>
     await fs.mkdir(directory, { recursive: true })
     await fs.mkdir(worktree, { recursive: true })
 
-    const hooks = await plugin.server({ directory, worktree } as never)
-    const config = {
+    const hooks = await plugin.server({ directory, worktree })
+    const config: PluginConfig = {
       skills: {
         paths: [path.join(directory, "skills")],
       },
     }
 
-    await hooks.config?.(config as never)
+    await hooks.config?.(config)
 
     expect(config.skills?.paths).toEqual([
       path.join(directory, "skills"),
@@ -40,20 +46,20 @@ test("server exposes file-based overrides and skill path injection", async () =>
       path.join(worktree, "skill"),
     ])
 
-    const output = { description: "placeholder", parameters: {} }
-    await hooks["tool.definition"]({ toolID: "bash" }, output as never)
+    const output: ToolDefinitionOutput = { description: "placeholder", parameters: {} }
+    await hooks["tool.definition"]?.({ toolID: "bash" }, output)
 
     expect(output.description).not.toBe("placeholder")
 
-    const planExit = { description: "placeholder", parameters: {} }
-    await hooks["tool.definition"]({ toolID: "plan_exit" }, planExit as never)
+    const planExit: ToolDefinitionOutput = { description: "placeholder", parameters: {} }
+    await hooks["tool.definition"]?.({ toolID: "plan_exit" }, planExit)
 
     expect(planExit.description).toBe(
       (await fs.readFile(path.join(process.cwd(), "src", "tool", "plan_exit.txt"), "utf8")).trimEnd(),
     )
 
-    const planEnter = { description: "placeholder", parameters: {} }
-    await hooks["tool.definition"]({ toolID: "plan_enter" }, planEnter as never)
+    const planEnter: ToolDefinitionOutput = { description: "placeholder", parameters: {} }
+    await hooks["tool.definition"]?.({ toolID: "plan_enter" }, planEnter)
 
     expect(planEnter.description).toBe(
       (await fs.readFile(path.join(process.cwd(), "src", "tool", "plan_enter.txt"), "utf8")).trimEnd(),
@@ -63,14 +69,16 @@ test("server exposes file-based overrides and skill path injection", async () =>
     const skillToolParameters = JSON.parse(
       await fs.readFile(path.join(process.cwd(), "src", "tool", "skill.json"), "utf8"),
     )
-    const skillToolOutput = {
+    const skillToolOutput: ToolDefinitionOutput = {
       description: `old intro\n\n## Available Skills\n- **build**: Build workflows`,
       parameters: {},
     }
 
-    await hooks["tool.definition"]({ toolID: "skill" }, skillToolOutput as never)
+    await hooks["tool.definition"]?.({ toolID: "skill" }, skillToolOutput)
 
     expect(skillToolOutput.description).toBe(`${skillToolOverride}\n\n## Available Skills\n- **build**: Build workflows`)
+    expect(skillToolOutput.description.startsWith(skillToolOverride)).toBe(true)
+    expect(skillToolOutput.description).not.toContain("No skills are currently available.")
 
     const { $schema: _schema, ...skillToolJsonSchema } = toJSONSchema(skillToolOutput.parameters as never) as {
       $schema?: string
@@ -79,28 +87,28 @@ test("server exposes file-based overrides and skill path injection", async () =>
 
     expect(skillToolJsonSchema).toEqual(skillToolParameters)
 
-    const skillToolCrLfOutput = {
+    const skillToolCrLfOutput: ToolDefinitionOutput = {
       description: `old intro\r\n\r\n## Available Skills\r\n- **build**: Build workflows`,
       parameters: {},
     }
 
-    await hooks["tool.definition"]({ toolID: "skill" }, skillToolCrLfOutput as never)
+    await hooks["tool.definition"]?.({ toolID: "skill" }, skillToolCrLfOutput)
 
     expect(skillToolCrLfOutput.description).toBe(
       `${skillToolOverride}\r\n\r\n## Available Skills\r\n- **build**: Build workflows`,
     )
 
-    const skillToolFallback = {
+    const skillToolFallback: ToolDefinitionOutput = {
       description: "intro only",
       parameters: {},
     }
 
-    await hooks["tool.definition"]({ toolID: "skill" }, skillToolFallback as never)
+    await hooks["tool.definition"]?.({ toolID: "skill" }, skillToolFallback)
 
     expect(skillToolFallback.description).toBe(skillToolOverride)
 
-    const compaction = {} as { prompt?: string }
-    await hooks["experimental.session.compacting"]({}, compaction as never)
+    const compaction: SessionCompactingOutput = {}
+    await hooks["experimental.session.compacting"]?.({}, compaction)
 
     const expectedCompaction = await fs.readFile(
       path.join(process.cwd(), "src", "compaction.txt"),
@@ -113,7 +121,7 @@ test("server exposes file-based overrides and skill path injection", async () =>
 
 test("prompt transforms use the paired snapshot text", async () => {
   await withTempDir(async (root) => {
-    const hooks = await plugin.server({ directory: root, worktree: root } as never)
+    const hooks = await plugin.server({ directory: root, worktree: root })
 
     const systemOverride = await fs.readFile(path.join(process.cwd(), "src", "system.txt"), "utf8")
     const systemSnapshotDir = path.join(process.cwd(), "src", "_snapshots", "system")
@@ -123,27 +131,29 @@ test("prompt transforms use the paired snapshot text", async () => {
 
     for (const entry of systemSnapshots) {
       const systemSnapshot = await fs.readFile(path.join(systemSnapshotDir, entry.name), "utf8")
-      const systemOutput = { system: [systemSnapshot] }
+      const systemOutput: ChatSystemOutput = { system: [systemSnapshot] }
 
-      await hooks["experimental.chat.system.transform"]({}, systemOutput as never)
+      await hooks["experimental.chat.system.transform"]?.({}, systemOutput)
 
       expect(systemOutput.system[0]).toBe(systemOverride)
+      expect(systemOutput.system[0]).toContain("<identity>")
+      expect(systemOutput.system[0]).not.toContain("interactive CLI tool")
     }
 
     const skillSystemOverride = await fs.readFile(path.join(process.cwd(), "src", "skills.txt"), "utf8")
-    const skillSystemOutput = {
+    const skillSystemOutput: ChatSystemOutput = {
       system: [`old intro\n<available_skills>\n  <skill>\n    <name>build</name>\n  </skill>\n</available_skills>`],
     }
 
-    await hooks["experimental.chat.system.transform"]({}, skillSystemOutput as never)
+    await hooks["experimental.chat.system.transform"]?.({}, skillSystemOutput)
 
     expect(skillSystemOutput.system[0]).toBe(`${skillSystemOverride}\n<available_skills>\n  <skill>\n    <name>build</name>\n  </skill>\n</available_skills>`)
 
-    const skillSystemCrLfOutput = {
+    const skillSystemCrLfOutput: ChatSystemOutput = {
       system: [`old intro\r\n<available_skills>\r\n  <skill>\r\n    <name>build</name>\r\n  </skill>\r\n</available_skills>`],
     }
 
-    await hooks["experimental.chat.system.transform"]({}, skillSystemCrLfOutput as never)
+    await hooks["experimental.chat.system.transform"]?.({}, skillSystemCrLfOutput)
 
     expect(skillSystemCrLfOutput.system[0]).toBe(
       `${skillSystemOverride}\r\n<available_skills>\r\n  <skill>\r\n    <name>build</name>\r\n  </skill>\r\n</available_skills>`,
@@ -154,9 +164,9 @@ test("prompt transforms use the paired snapshot text", async () => {
       "utf8",
     )
     const agentOverride = await fs.readFile(path.join(process.cwd(), "src", "agent", "explore.txt"), "utf8")
-    const agentOutput = { system: [agentSnapshot] }
+    const agentOutput: ChatSystemOutput = { system: [agentSnapshot] }
 
-    await hooks["experimental.chat.system.transform"]({}, agentOutput as never)
+    await hooks["experimental.chat.system.transform"]?.({}, agentOutput)
 
     expect(agentOutput.system[0]).toBe(agentOverride)
 
@@ -169,9 +179,9 @@ test("prompt transforms use the paired snapshot text", async () => {
       const name = path.basename(entry.name, ".txt")
       const snapshot = await fs.readFile(path.join(agentSnapshotDir, entry.name), "utf8")
       const override = await fs.readFile(path.join(process.cwd(), "src", "agent", `${name}.txt`), "utf8")
-      const output = { system: [snapshot] }
+      const output: ChatSystemOutput = { system: [snapshot] }
 
-      await hooks["experimental.chat.system.transform"]({}, output as never)
+      await hooks["experimental.chat.system.transform"]?.({}, output)
 
       expect(output.system[0]).toBe(override)
     }
@@ -181,9 +191,9 @@ test("prompt transforms use the paired snapshot text", async () => {
       "utf8",
     )
     const sessionOverride = await fs.readFile(path.join(process.cwd(), "src", "build-switch.txt"), "utf8")
-    const messages = { messages: [{ parts: [{ type: "text", text: sessionSnapshot }] }] }
+    const messages: ChatMessagesOutput = { messages: [{ parts: [{ type: "text", text: sessionSnapshot }] }] }
 
-    await hooks["experimental.chat.messages.transform"]({}, messages as never)
+    await hooks["experimental.chat.messages.transform"]?.({}, messages)
 
     expect(messages.messages[0].parts[0].text).toBe(sessionOverride)
 
@@ -200,9 +210,9 @@ test("prompt transforms use the paired snapshot text", async () => {
       const base = path.basename(name, ".txt")
       const snapshot = await fs.readFile(path.join(sessionSnapshotDir, `${base}.txt`), "utf8")
       const override = await fs.readFile(path.join(process.cwd(), "src", name), "utf8")
-      const output = { messages: [{ parts: [{ type: "text", text: snapshot }] }] }
+      const output: ChatMessagesOutput = { messages: [{ parts: [{ type: "text", text: snapshot }] }] }
 
-      await hooks["experimental.chat.messages.transform"]({}, output as never)
+      await hooks["experimental.chat.messages.transform"]?.({}, output)
 
       expect(output.messages[0].parts[0].text).toBe(override)
     }
@@ -211,13 +221,13 @@ test("prompt transforms use the paired snapshot text", async () => {
 
 test("prompt transforms leave unmatched content untouched", async () => {
   await withTempDir(async (root) => {
-    const hooks = await plugin.server({ directory: root, worktree: root } as never)
+    const hooks = await plugin.server({ directory: root, worktree: root })
 
-    const systemOutput = { system: ["unmatched system prompt"] }
-    await hooks["experimental.chat.system.transform"]({}, systemOutput as never)
+    const systemOutput: ChatSystemOutput = { system: ["unmatched system prompt"] }
+    await hooks["experimental.chat.system.transform"]?.({}, systemOutput)
     expect(systemOutput.system).toEqual(["unmatched system prompt"])
 
-    const messages = {
+    const messages: ChatMessagesOutput = {
       messages: [
         {
           parts: [
@@ -228,7 +238,7 @@ test("prompt transforms leave unmatched content untouched", async () => {
       ],
     }
 
-    await hooks["experimental.chat.messages.transform"]({}, messages as never)
+    await hooks["experimental.chat.messages.transform"]?.({}, messages)
 
     expect(messages.messages[0].parts).toEqual([
       { type: "text", text: "unmatched session prompt" },

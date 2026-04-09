@@ -6,60 +6,11 @@ import path from "node:path"
 import { spawnSync } from "node:child_process"
 import { fileURLToPath } from "node:url"
 
+import { collectTests, copyRootTextFiles, copyTree } from "./shared.mjs"
+
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 const srcRoot = path.join(repoRoot, "src")
 const distRoot = path.join(repoRoot, "dist")
-
-/** @typedef {{ name: string, isFile(): boolean, isDirectory(): boolean }} DirEntryLike */
-
-async function collectTests(dir, out) {
-  const entries = (await fs.readdir(dir, { withFileTypes: true }).catch(() => []))
-    .sort((a, b) => a.name.localeCompare(b.name))
-
-  for (const entry of entries) {
-    const full = path.join(dir, entry.name)
-    if (entry.isDirectory()) {
-      await collectTests(full, out)
-      continue
-    }
-
-    if (entry.isFile() && /\.test\.(ts|tsx|js|mjs)$/.test(entry.name)) {
-      out.push(path.relative(repoRoot, full))
-    }
-  }
-}
-
-async function copyTree(srcDir, destDir) {
-  const entries = /** @type {DirEntryLike[]} */ (await fs.readdir(srcDir, { withFileTypes: true }))
-    .sort((a, b) => a.name.localeCompare(b.name))
-
-  await fs.mkdir(destDir, { recursive: true })
-
-  for (const entry of entries) {
-    const srcPath = path.join(srcDir, entry.name)
-    const destPath = path.join(destDir, entry.name)
-
-    if (entry.isDirectory()) {
-      await copyTree(srcPath, destPath)
-      continue
-    }
-
-    if (entry.isFile()) {
-      await fs.copyFile(srcPath, destPath)
-    }
-  }
-}
-
-async function copyRootTextFiles(srcDir, destDir) {
-  const entries = (await fs.readdir(srcDir, { withFileTypes: true }).catch(() => []))
-    .sort((a, b) => a.name.localeCompare(b.name))
-
-  for (const entry of entries) {
-    if (!entry.isFile() || !entry.name.endsWith(".txt")) continue
-
-    await fs.copyFile(path.join(srcDir, entry.name), path.join(destDir, entry.name))
-  }
-}
 
 function parseJsonLines(text) {
   return text
@@ -97,24 +48,44 @@ async function runLivePromptCheck() {
     await copyTree(path.join(distRoot, "tool"), path.join(pluginDir, "tool"))
     await copyTree(path.join(distRoot, "_snapshots"), path.join(pluginDir, "_snapshots"))
 
-    const result = spawnSync(
-      "opencode",
-      ["run", "--format", "json", "--model", "openai/gpt-5.4-mini", "reply with exactly ok"],
-      {
-        cwd: tempRoot,
-        encoding: "utf8",
-      },
-    )
+    const prompts = [
+      { prompt: "hi", maxInputTokens: 1800, maxTotalTokens: 2000 },
+      { prompt: "Explain context in Go", maxInputTokens: 2200, maxTotalTokens: 2400 },
+    ]
 
-    if (result.status !== 0) {
-      throw new Error(
-        `Live prompt check failed with exit code ${result.status ?? "unknown"}\n${result.stderr ?? ""}`,
+    for (const { prompt, maxInputTokens, maxTotalTokens } of prompts) {
+      const result = spawnSync(
+        "opencode",
+        ["run", "--format", "json", "--model", "openai/gpt-5.4-mini", prompt],
+        {
+          cwd: tempRoot,
+          encoding: "utf8",
+        },
       )
-    }
 
-    const events = parseJsonLines(result.stdout ?? "")
-    if (!events.some((event) => event?.type === "text" && event?.part?.text === "ok")) {
-      throw new Error(`Live prompt check did not return ok\n${result.stdout ?? ""}\n${result.stderr ?? ""}`)
+      if (result.status !== 0) {
+        throw new Error(
+          `Live prompt check failed for ${JSON.stringify(prompt)} with exit code ${result.status ?? "unknown"}\n${result.stderr ?? ""}`,
+        )
+      }
+
+      const events = parseJsonLines(result.stdout ?? "")
+      const textEvent = events.find((event) => event?.type === "text")
+      if (!textEvent) {
+        throw new Error(`Live prompt check produced no text event for ${JSON.stringify(prompt)}`)
+      }
+
+      const finishes = events.filter((event) => event?.type === "step_finish")
+      const last = finishes.at(-1)?.part?.tokens
+      if (!last) {
+        throw new Error(`Live prompt check produced no token data for ${JSON.stringify(prompt)}`)
+      }
+
+      if (last.input > maxInputTokens || last.total > maxTotalTokens) {
+        throw new Error(
+          `Token budget regression for ${JSON.stringify(prompt)}: input=${last.input}, total=${last.total}`,
+        )
+      }
     }
   } finally {
     await fs.rm(tempRoot, { recursive: true, force: true })
@@ -123,8 +94,7 @@ async function runLivePromptCheck() {
   console.log("Live prompt check passed.")
 }
 
-const tests = []
-await collectTests(srcRoot, tests)
+const tests = await collectTests(srcRoot, repoRoot)
 
 if (!tests.length) {
   console.log("No src tests found.")

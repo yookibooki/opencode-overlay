@@ -3,7 +3,7 @@ import fs from "fs/promises"
 import os from "os"
 import path from "path"
 
-import plugin from "./index"
+import plugin, { type PluginConfig } from "./index"
 
 async function withTempDir<T>(fn: (root: string) => Promise<T>) {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), "opencode-thrifty-skill-"))
@@ -22,14 +22,14 @@ test("config hook adds extra skill roots without duplicates", async () => {
     await fs.mkdir(directory, { recursive: true })
     await fs.mkdir(worktree, { recursive: true })
 
-    const hooks = await plugin.server({ worktree, directory } as never)
-    const config = {
+    const hooks = await plugin.server({ worktree, directory })
+    const config: PluginConfig = {
       skills: {
         paths: [path.join(directory, "skills")],
       },
     }
 
-    await hooks.config?.(config as never)
+    await hooks.config?.(config)
 
     expect(config.skills?.paths).toEqual([
       path.join(directory, "skills"),
@@ -48,10 +48,10 @@ test("config hook creates skill roots when none exist yet", async () => {
     await fs.mkdir(directory, { recursive: true })
     await fs.mkdir(worktree, { recursive: true })
 
-    const hooks = await plugin.server({ worktree, directory } as never)
-    const config = {}
+    const hooks = await plugin.server({ worktree, directory })
+    const config: PluginConfig = {}
 
-    await hooks.config?.(config as never)
+    await hooks.config?.(config)
 
     expect((config as { skills?: { paths?: string[] } }).skills?.paths).toEqual([
       path.join(directory, "skills"),
@@ -67,10 +67,10 @@ test("config hook accepts either directory or worktree on its own", async () => 
     const directory = path.join(root, "directory")
     await fs.mkdir(directory, { recursive: true })
 
-    const hooks = await plugin.server({ directory } as never)
-    const config = {}
+    const hooks = await plugin.server({ directory })
+    const config: PluginConfig = {}
 
-    await hooks.config?.(config as never)
+    await hooks.config?.(config)
 
     expect((config as { skills?: { paths?: string[] } }).skills?.paths).toEqual([
       path.join(directory, "skills"),
@@ -82,10 +82,10 @@ test("config hook accepts either directory or worktree on its own", async () => 
     const worktree = path.join(root, "worktree")
     await fs.mkdir(worktree, { recursive: true })
 
-    const hooks = await plugin.server({ worktree } as never)
-    const config = {}
+    const hooks = await plugin.server({ worktree })
+    const config: PluginConfig = {}
 
-    await hooks.config?.(config as never)
+    await hooks.config?.(config)
 
     expect((config as { skills?: { paths?: string[] } }).skills?.paths).toEqual([
       path.join(worktree, "skills"),

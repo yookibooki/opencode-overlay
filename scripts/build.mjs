@@ -5,18 +5,14 @@ import path from "node:path"
 import { spawnSync } from "node:child_process"
 import { fileURLToPath } from "node:url"
 
+import { copyRootTextFiles, copyTree, isTextAsset, isToolAsset } from "./shared.mjs"
+
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 const srcRoot = path.join(repoRoot, "src")
 const distRoot = path.join(repoRoot, "dist")
 
-/** @typedef {{ name: string, isFile(): boolean, isDirectory(): boolean }} DirEntryLike */
-
 async function removeDir(dir) {
   await fs.rm(dir, { recursive: true, force: true })
-}
-
-async function ensureDir(dir) {
-  await fs.mkdir(dir, { recursive: true })
 }
 
 async function requireDirectory(dir, label) {
@@ -31,57 +27,6 @@ async function requireDirectory(dir, label) {
     }
 
     throw error
-  }
-}
-
-async function copyFile(src, dest) {
-  await ensureDir(path.dirname(dest))
-  await fs.copyFile(src, dest)
-}
-
-function isToolAsset(entry) {
-  return entry.isFile() && (entry.name.endsWith(".txt") || entry.name.endsWith(".json"))
-}
-
-function isTextAsset(entry) {
-  return entry.isFile() && entry.name.endsWith(".txt")
-}
-
-/**
- * @param {string} srcDir
- * @param {string} destDir
- * @param {(srcPath: string, entry: DirEntryLike) => boolean} [shouldCopy]
- */
-async function copyTree(srcDir, destDir, shouldCopy) {
-  const entries = /** @type {DirEntryLike[]} */ (await fs.readdir(srcDir, { withFileTypes: true }))
-  entries.sort((a, b) => a.name.localeCompare(b.name))
-
-  await ensureDir(destDir)
-
-  for (const entry of entries) {
-    const srcPath = path.join(srcDir, entry.name)
-    const destPath = path.join(destDir, entry.name)
-    if (entry.isDirectory()) {
-      await copyTree(srcPath, destPath, shouldCopy)
-      continue
-    }
-
-    if (shouldCopy && !shouldCopy(srcPath, entry)) continue
-
-    if (entry.isFile()) {
-      await copyFile(srcPath, destPath)
-    }
-  }
-}
-
-async function copyRootTextFiles() {
-  const entries = (await fs.readdir(srcRoot, { withFileTypes: true }))
-    .sort((a, b) => a.name.localeCompare(b.name))
-
-  for (const entry of entries) {
-    if (!isTextAsset(entry)) continue
-
-    await copyFile(path.join(srcRoot, entry.name), path.join(distRoot, entry.name))
   }
 }
 
@@ -138,7 +83,7 @@ async function main() {
 
   runTypeDeclarations()
 
-  await copyRootTextFiles()
+  await copyRootTextFiles(srcRoot, distRoot)
   await requireDirectory(path.join(srcRoot, "_snapshots"), "Source snapshots tree")
   await Promise.all([
     requireDirectory(path.join(srcRoot, "_snapshots", "system"), "System prompt snapshots"),

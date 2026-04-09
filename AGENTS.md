@@ -18,7 +18,6 @@ Read `src/` first. This is the main customization layer. Most meaningful behavio
 
 - Preserve the file-based customization model
 - Do not move user-editable behavior into code unless necessary
-- Learn from `https://github.com/alvinunreal/oh-my-opencode-slim` for design ideas, but adapt — do not copy blindly
 
 ## File map
 
@@ -84,8 +83,8 @@ Keep overrides visible and file-based. Prefer an override file over hidden inter
 
 ## Reference (read-only)
 
-- OpenCode repo: `https://github.com/anomalyco/opencode`
-- Plugin docs: `https://opencode.ai/docs/plugins`
-- Design reference: `https://github.com/alvinunreal/oh-my-opencode-slim`
+- OpenCode repo: `/home/dev/gitops/opencode/opencode`
+- Plugin docs: `/home/dev/gitops/opencode/packages/web/src/content/docs/plugins.mdx`
 
-Read from them. Do not edit them.
+ALWAYS READ REFERENCE FIRST.
+
