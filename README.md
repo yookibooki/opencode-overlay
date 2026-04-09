@@ -1,4 +1,4 @@
-# OpenCode-Thrifty
+# OpenCode Overlay
 
 Customize OpenCode's default context layer by editing plain text files.
 
@@ -7,8 +7,8 @@ Customize OpenCode's default context layer by editing plain text files.
 **1. Clone the repo** to a stable location:
 
 ```sh
-INSTALL_DIR="/path/you-will-keep/opencode-thrifty"
-git clone --depth 1 https://github.com/yookibooki/opencode-thrifty "$INSTALL_DIR"
+INSTALL_DIR="/path/you-will-keep/opencode-overlay"
+git clone --depth 1 https://github.com/yookibooki/opencode-overlay "$INSTALL_DIR"
 cd "$INSTALL_DIR"
 bun install
 ```
@@ -46,13 +46,22 @@ Add `--global` only if you want to register it for your personal OpenCode setup 
 - `bun run snapshots:update` refreshes `src/_snapshots/**` and `src/prompts.manifest.json`.
 - Local `skills/` and `skill/` folders are appended from `directory` and `worktree`.
 
+## Community and maintenance
+
+- Use [Discussions](https://github.com/yookibooki/opencode-overlay/discussions) for ideas, design feedback, and questions.
+- Use Issues for bugs, regressions, or missing override coverage.
+- Keep changes file-based; prefer `src/` overrides over hidden logic.
+- Update `README.md` or `AGENTS.md` when workflow expectations change.
+
 ## Notes
 
 - Missing optional files and directories are ignored; unreadable paths still fail fast.
 - Build output goes to `dist/`.
+- Generated files should not be edited by hand.
 
 ## Development
 
 - `bun run build`
 - `bun run test`
+- `bun run check`
 - `bun run snapshots:update` when upstream OpenCode prompt text changes

@@ -1,0 +1,24 @@
+name: Feature request
+description: Suggest a new override or prompt reduction
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: Please describe the change you want in terms of the override file that would hold it.
+  - type: textarea
+    id: request
+    attributes:
+      label: Request
+    validations:
+      required: true
+  - type: textarea
+    id: rationale
+    attributes:
+      label: Why does this help?
+    validations:
+      required: true
+  - type: textarea
+    id: file
+    attributes:
+      label: Suggested file or area
+      placeholder: src/agent/...

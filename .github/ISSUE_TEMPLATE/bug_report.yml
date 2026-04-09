@@ -1,0 +1,39 @@
+name: Bug report
+description: Report a regression or broken override
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for taking the time to report a problem.
+  - type: input
+    id: opencode_version
+    attributes:
+      label: OpenCode version
+      placeholder: e.g. 1.2.3
+    validations:
+      required: true
+  - type: input
+    id: file
+    attributes:
+      label: Affected file
+      placeholder: src/system.txt
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
