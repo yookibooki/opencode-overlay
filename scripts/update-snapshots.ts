@@ -28,6 +28,12 @@ const systemNames = ["default", "anthropic", "gpt", "gemini", "codex", "beast", 
 const manifestPath = path.join(repoRoot, "src", "prompts.manifest.json")
 const snapshotRoot = path.join(repoRoot, "src", "_snapshots")
 
+type SnapshotGroup = {
+  kind: "system" | "session" | "agent"
+  names: string[]
+  resolvePath: (name: string) => string
+}
+
 async function fetchTree(): Promise<TreeEntry[]> {
   const url = `https://api.github.com/repos/${upstreamOwner}/${upstreamRepo}/git/trees/${upstreamRef}?recursive=1`
   const response = await fetch(url, {
@@ -68,6 +74,20 @@ function sortNames(names: string[]) {
   return [...new Set(names)].sort((a, b) => a.localeCompare(b))
 }
 
+async function writeSnapshots(groups: SnapshotGroup[]) {
+  await fs.rm(snapshotRoot, { recursive: true, force: true })
+
+  for (const { kind, names, resolvePath } of groups) {
+    await Promise.all(
+      names.map(async (name) => {
+        const out = path.join(snapshotRoot, kind, `${name}.txt`)
+        await fs.mkdir(path.dirname(out), { recursive: true })
+        await fs.writeFile(out, await fetchText(resolvePath(name)))
+      }),
+    )
+  }
+}
+
 export function buildSnapshotManifest(tree: TreeEntry[]): Manifest {
   const paths = new Set(tree.filter((entry) => entry.type === "blob").map((entry) => entry.path))
 
@@ -94,33 +114,15 @@ export function buildSnapshotManifest(tree: TreeEntry[]): Manifest {
 async function main() {
   const tree = await fetchTree()
   const manifest = buildSnapshotManifest(tree)
-  const { system, session, agent } = manifest
-
-  await fs.rm(snapshotRoot, { recursive: true, force: true })
-
-  const writes = [
-    ...system.map(async (name) => {
-      const content = await fetchText(`${sessionPromptPrefix}${name}.txt`)
-      const out = path.join(snapshotRoot, "system", `${name}.txt`)
-      await fs.mkdir(path.dirname(out), { recursive: true })
-      await fs.writeFile(out, content)
-    }),
-    ...session.map(async (name) => {
-      const content = await fetchText(`${sessionPromptPrefix}${name}.txt`)
-      const out = path.join(snapshotRoot, "session", `${name}.txt`)
-      await fs.mkdir(path.dirname(out), { recursive: true })
-      await fs.writeFile(out, content)
-    }),
-    ...agent.map(async (name) => {
-      const upstreamPath = name === "generate" ? agentGeneratePath : `${agentPromptPrefix}${name}.txt`
-      const content = await fetchText(upstreamPath)
-      const out = path.join(snapshotRoot, "agent", `${name}.txt`)
-      await fs.mkdir(path.dirname(out), { recursive: true })
-      await fs.writeFile(out, content)
-    }),
-  ]
-
-  await Promise.all(writes)
+  await writeSnapshots([
+    { kind: "system", names: manifest.system, resolvePath: (name) => `${sessionPromptPrefix}${name}.txt` },
+    { kind: "session", names: manifest.session, resolvePath: (name) => `${sessionPromptPrefix}${name}.txt` },
+    {
+      kind: "agent",
+      names: manifest.agent,
+      resolvePath: (name) => (name === "generate" ? agentGeneratePath : `${agentPromptPrefix}${name}.txt`),
+    },
+  ])
   await fs.writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`)
 }
 

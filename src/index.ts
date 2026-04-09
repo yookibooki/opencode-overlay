@@ -23,9 +23,7 @@ type ServerInput = {
   worktree?: string
 }
 
-type PromptOverrideSource =
-  | { dir: string }
-  | { text: string }
+type PromptOverrideResolver = (name: string) => Promise<string | undefined> | string | undefined
 
 async function readText(filePath: string) {
   try {
@@ -141,23 +139,21 @@ function rewriteMessagePartsInPlace(
   }
 }
 
-async function loadPromptPairs(snapshotDir: string, overrideSources: PromptOverrideSource[]) {
-  if (!overrideSources.length) return []
-
+async function loadPromptPairs(snapshotDir: string, getOverride: PromptOverrideResolver) {
   const names = await listFileBaseNames(snapshotDir, [".txt"])
-  const pairs = [] as PrefixPair[]
+  const pairs = await Promise.all(
+    names.map(async (name) => {
+      const builtin = await readText(path.join(snapshotDir, `${name}.txt`))
+      if (builtin === undefined) return undefined
 
-  for (const name of names) {
-    const builtin = await readText(path.join(snapshotDir, `${name}.txt`))
-    if (builtin === undefined) continue
+      const override = await getOverride(name)
+      if (override === undefined) return undefined
 
-    for (const source of overrideSources) {
-      const override = "text" in source ? source.text : await readText(path.join(source.dir, `${name}.txt`))
-      if (override !== undefined) pairs.push({ builtin, override })
-    }
-  }
+      return { builtin, override }
+    }),
+  )
 
-  return sortByLengthDesc(pairs)
+  return sortByLengthDesc(pairs.filter((pair): pair is PrefixPair => pair !== undefined))
 }
 
 async function loadToolOverrides() {
@@ -187,6 +183,7 @@ export default {
   server: async (input?: ServerInput) => {
     const systemOverride = await readText(systemPath)
     const [
+      namedSystemPrefixPairs,
       systemPrefixPairs,
       agentPrefixPairs,
       sessionPrefixPairs,
@@ -194,31 +191,25 @@ export default {
       toolOverrides,
       skillSystemOverride,
     ] = await Promise.all([
-      loadPromptPairs(snapshotSystemDir, [
-        { dir: root },
-        ...(systemOverride === undefined ? [] : [{ text: systemOverride }]),
-      ]),
-      loadPromptPairs(snapshotAgentDir, [{ dir: agentOverridesDir }]),
-      loadPromptPairs(snapshotSessionDir, [{ dir: root }]),
+      loadPromptPairs(snapshotSystemDir, (name) => readText(path.join(root, `${name}.txt`))),
+      loadPromptPairs(snapshotSystemDir, () => systemOverride),
+      loadPromptPairs(snapshotAgentDir, (name) => readText(path.join(agentOverridesDir, `${name}.txt`))),
+      loadPromptPairs(snapshotSessionDir, (name) => readText(path.join(root, `${name}.txt`))),
       readText(path.join(root, "compaction.txt")),
       loadToolOverrides(),
       readText(path.join(root, "skills.txt")),
     ])
-    const chatPrefixPairs = sortByLengthDesc([...agentPrefixPairs, ...systemPrefixPairs])
+    const chatPrefixPairs = sortByLengthDesc([...agentPrefixPairs, ...namedSystemPrefixPairs, ...systemPrefixPairs])
 
     return {
       // Extend the built-in skill service with project-root folders.
       config: async (cfg: { skills?: { paths?: string[]; urls?: string[] } }) => {
         const skillPaths = new Set<string>()
 
-        if (input?.directory) {
-          skillPaths.add(path.join(input.directory, "skills"))
-          skillPaths.add(path.join(input.directory, "skill"))
-        }
-
-        if (input?.worktree) {
-          skillPaths.add(path.join(input.worktree, "skills"))
-          skillPaths.add(path.join(input.worktree, "skill"))
+        for (const base of [input?.directory, input?.worktree]) {
+          if (base === undefined) continue
+          skillPaths.add(path.join(base, "skills"))
+          skillPaths.add(path.join(base, "skill"))
         }
 
         if (!skillPaths.size) return
