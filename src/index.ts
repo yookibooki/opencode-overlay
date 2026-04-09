@@ -23,6 +23,10 @@ type ServerInput = {
   worktree?: string
 }
 
+type PromptOverrideSource =
+  | { dir: string }
+  | { text: string }
+
 async function readText(filePath: string) {
   try {
     return await fs.readFile(filePath, "utf8")
@@ -137,32 +141,23 @@ function rewriteMessagePartsInPlace(
   }
 }
 
-async function loadNamedPromptPairs(snapshotDir: string, overrideDir: string) {
-  const names = await listFileBaseNames(snapshotDir, [".txt"])
-  const pairs = await Promise.all(
-    names.map(async (name) => {
-      const builtin = await readText(path.join(snapshotDir, `${name}.txt`))
-      if (builtin === undefined) return undefined
-
-      const override = await readText(path.join(overrideDir, `${name}.txt`))
-      if (override === undefined) return undefined
-      return { builtin, override }
-    }),
-  )
-
-  return sortByLengthDesc(pairs.filter((pair): pair is PrefixPair => pair !== undefined))
-}
-
-async function loadSharedPromptPairs(snapshotDir: string, sharedOverride: string | undefined) {
-  if (sharedOverride === undefined) return []
+async function loadPromptPairs(snapshotDir: string, overrideSources: PromptOverrideSource[]) {
+  if (!overrideSources.length) return []
 
   const names = await listFileBaseNames(snapshotDir, [".txt"])
-  const builtins = await Promise.all(names.map((name) => readText(path.join(snapshotDir, `${name}.txt`))))
-  return sortByLengthDesc(
-    builtins
-      .filter((text): text is string => text !== undefined)
-      .map((builtin) => ({ builtin, override: sharedOverride })),
-  )
+  const pairs = [] as PrefixPair[]
+
+  for (const name of names) {
+    const builtin = await readText(path.join(snapshotDir, `${name}.txt`))
+    if (builtin === undefined) continue
+
+    for (const source of overrideSources) {
+      const override = "text" in source ? source.text : await readText(path.join(source.dir, `${name}.txt`))
+      if (override !== undefined) pairs.push({ builtin, override })
+    }
+  }
+
+  return sortByLengthDesc(pairs)
 }
 
 async function loadToolOverrides() {
@@ -187,26 +182,11 @@ async function loadToolOverrides() {
   return overrides
 }
 
-function customSkillPaths(input?: ServerInput) {
-  const paths: string[] = []
-
-  if (input?.directory) {
-    paths.push(path.join(input.directory, "skills"), path.join(input.directory, "skill"))
-  }
-
-  if (input?.worktree) {
-    paths.push(path.join(input.worktree, "skills"), path.join(input.worktree, "skill"))
-  }
-
-  return [...new Set(paths)]
-}
-
 export default {
   id: "opencode-thrifty",
   server: async (input?: ServerInput) => {
     const systemOverride = await readText(systemPath)
     const [
-      namedSystemPrefixPairs,
       systemPrefixPairs,
       agentPrefixPairs,
       sessionPrefixPairs,
@@ -214,21 +194,34 @@ export default {
       toolOverrides,
       skillSystemOverride,
     ] = await Promise.all([
-      loadNamedPromptPairs(snapshotSystemDir, root),
-      loadSharedPromptPairs(snapshotSystemDir, systemOverride),
-      loadNamedPromptPairs(snapshotAgentDir, agentOverridesDir),
-      loadNamedPromptPairs(snapshotSessionDir, root),
+      loadPromptPairs(snapshotSystemDir, [
+        { dir: root },
+        ...(systemOverride === undefined ? [] : [{ text: systemOverride }]),
+      ]),
+      loadPromptPairs(snapshotAgentDir, [{ dir: agentOverridesDir }]),
+      loadPromptPairs(snapshotSessionDir, [{ dir: root }]),
       readText(path.join(root, "compaction.txt")),
       loadToolOverrides(),
       readText(path.join(root, "skills.txt")),
     ])
-    const chatPrefixPairs = sortByLengthDesc([...agentPrefixPairs, ...namedSystemPrefixPairs, ...systemPrefixPairs])
+    const chatPrefixPairs = sortByLengthDesc([...agentPrefixPairs, ...systemPrefixPairs])
 
     return {
       // Extend the built-in skill service with project-root folders.
       config: async (cfg: { skills?: { paths?: string[]; urls?: string[] } }) => {
-        const skillPaths = customSkillPaths(input)
-        if (!skillPaths.length) return
+        const skillPaths = new Set<string>()
+
+        if (input?.directory) {
+          skillPaths.add(path.join(input.directory, "skills"))
+          skillPaths.add(path.join(input.directory, "skill"))
+        }
+
+        if (input?.worktree) {
+          skillPaths.add(path.join(input.worktree, "skills"))
+          skillPaths.add(path.join(input.worktree, "skill"))
+        }
+
+        if (!skillPaths.size) return
 
         const next = new Set([...(cfg.skills?.paths ?? []), ...skillPaths])
         cfg.skills = {
