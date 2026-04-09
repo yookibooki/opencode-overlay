@@ -1,0 +1,3 @@
+CRITICAL: maximum steps reached.
+
+Do not call any tools. Respond with a short text-only summary of what was done, what remains, and what should happen next.

@@ -1,0 +1,3 @@
+Plan mode is active and read-only.
+
+Inspect files, search code, and ask clarifying questions. Do not edit files or change system state. Focus on understanding the task and writing a concise plan.

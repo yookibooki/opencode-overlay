@@ -43,6 +43,10 @@ function isToolAsset(entry) {
   return entry.isFile() && (entry.name.endsWith(".txt") || entry.name.endsWith(".json"))
 }
 
+function isTextAsset(entry) {
+  return entry.isFile() && entry.name.endsWith(".txt")
+}
+
 /**
  * @param {string} srcDir
  * @param {string} destDir
@@ -67,6 +71,17 @@ async function copyTree(srcDir, destDir, shouldCopy) {
     if (entry.isFile()) {
       await copyFile(srcPath, destPath)
     }
+  }
+}
+
+async function copyRootTextFiles() {
+  const entries = (await fs.readdir(srcRoot, { withFileTypes: true }))
+    .sort((a, b) => a.name.localeCompare(b.name))
+
+  for (const entry of entries) {
+    if (!isTextAsset(entry)) continue
+
+    await copyFile(path.join(srcRoot, entry.name), path.join(distRoot, entry.name))
   }
 }
 
@@ -107,14 +122,14 @@ async function main() {
     format: "esm",
   })
 
-  const toolEntries = (await fs.readdir(path.join(srcRoot, "tools"), { withFileTypes: true })).filter(
+  const toolEntries = (await fs.readdir(path.join(srcRoot, "tool"), { withFileTypes: true })).filter(
     (entry) => entry.isFile() && entry.name.endsWith(".ts"),
   )
 
   if (toolEntries.length > 0) {
     await runBunBuild("tool runtime", {
-      entrypoints: toolEntries.map((entry) => path.join(srcRoot, "tools", entry.name)),
-      outdir: path.join(distRoot, "tools"),
+      entrypoints: toolEntries.map((entry) => path.join(srcRoot, "tool", entry.name)),
+      outdir: path.join(distRoot, "tool"),
       target: "bun",
       format: "esm",
       external: ["zod"],
@@ -123,16 +138,16 @@ async function main() {
 
   runTypeDeclarations()
 
-  await copyFile(path.join(srcRoot, "system.txt"), path.join(distRoot, "system.txt"))
-  await requireDirectory(path.join(srcRoot, "prompts"), "Source prompts tree")
+  await copyRootTextFiles()
+  await requireDirectory(path.join(srcRoot, "_snapshots"), "Source snapshots tree")
   await Promise.all([
-    requireDirectory(path.join(srcRoot, "prompts", "_snapshots"), "Prompt snapshots tree"),
-    requireDirectory(path.join(srcRoot, "prompts", "_snapshots", "system"), "System prompt snapshots"),
-    requireDirectory(path.join(srcRoot, "prompts", "_snapshots", "agent"), "Agent prompt snapshots"),
-    requireDirectory(path.join(srcRoot, "prompts", "_snapshots", "session"), "Session prompt snapshots"),
+    requireDirectory(path.join(srcRoot, "_snapshots", "system"), "System prompt snapshots"),
+    requireDirectory(path.join(srcRoot, "_snapshots", "agent"), "Agent prompt snapshots"),
+    requireDirectory(path.join(srcRoot, "_snapshots", "session"), "Session prompt snapshots"),
   ])
-  await copyTree(path.join(srcRoot, "prompts"), path.join(distRoot, "prompts"))
-  await copyTree(path.join(srcRoot, "tools"), path.join(distRoot, "tools"), (_srcPath, entry) => isToolAsset(entry))
+  await copyTree(path.join(srcRoot, "_snapshots"), path.join(distRoot, "_snapshots"))
+  await copyTree(path.join(srcRoot, "agent"), path.join(distRoot, "agent"), (_srcPath, entry) => isTextAsset(entry))
+  await copyTree(path.join(srcRoot, "tool"), path.join(distRoot, "tool"), (_srcPath, entry) => isToolAsset(entry))
 }
 
 main().catch((error) => {

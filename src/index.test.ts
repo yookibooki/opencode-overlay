@@ -3,6 +3,7 @@ import { spawnSync } from "child_process"
 import fs from "fs/promises"
 import os from "os"
 import path from "path"
+import { toJSONSchema } from "zod"
 
 import plugin from "./index"
 
@@ -48,12 +49,19 @@ test("server exposes file-based overrides and skill path injection", async () =>
     await hooks["tool.definition"]({ toolID: "plan_exit" }, planExit as never)
 
     expect(planExit.description).toBe(
-      (await fs.readFile(path.join(process.cwd(), "src", "tools", "plan_exit.txt"), "utf8")).trimEnd(),
+      (await fs.readFile(path.join(process.cwd(), "src", "tool", "plan_exit.txt"), "utf8")).trimEnd(),
     )
 
-    const skillToolOverride = (await fs.readFile(path.join(process.cwd(), "src", "tools", "skill.txt"), "utf8")).trimEnd()
+    const planEnter = { description: "placeholder", parameters: {} }
+    await hooks["tool.definition"]({ toolID: "plan_enter" }, planEnter as never)
+
+    expect(planEnter.description).toBe(
+      (await fs.readFile(path.join(process.cwd(), "src", "tool", "plan_enter.txt"), "utf8")).trimEnd(),
+    )
+
+    const skillToolOverride = (await fs.readFile(path.join(process.cwd(), "src", "tool", "skill.txt"), "utf8")).trimEnd()
     const skillToolParameters = JSON.parse(
-      await fs.readFile(path.join(process.cwd(), "src", "tools", "skill.json"), "utf8"),
+      await fs.readFile(path.join(process.cwd(), "src", "tool", "skill.json"), "utf8"),
     )
     const skillToolOutput = {
       description: `old intro\n\n## Available Skills\n- **build**: Build workflows`,
@@ -63,7 +71,13 @@ test("server exposes file-based overrides and skill path injection", async () =>
     await hooks["tool.definition"]({ toolID: "skill" }, skillToolOutput as never)
 
     expect(skillToolOutput.description).toBe(`${skillToolOverride}\n\n## Available Skills\n- **build**: Build workflows`)
-    expect(skillToolOutput.parameters).toEqual(skillToolParameters)
+
+    const { $schema: _schema, ...skillToolJsonSchema } = toJSONSchema(skillToolOutput.parameters as never) as {
+      $schema?: string
+      [key: string]: unknown
+    }
+
+    expect(skillToolJsonSchema).toEqual(skillToolParameters)
 
     const skillToolCrLfOutput = {
       description: `old intro\r\n\r\n## Available Skills\r\n- **build**: Build workflows`,
@@ -89,7 +103,7 @@ test("server exposes file-based overrides and skill path injection", async () =>
     await hooks["experimental.session.compacting"]({}, compaction as never)
 
     const expectedCompaction = await fs.readFile(
-      path.join(process.cwd(), "src", "prompts", "session", "compaction.txt"),
+      path.join(process.cwd(), "src", "compaction.txt"),
       "utf8",
     )
 
@@ -102,7 +116,7 @@ test("prompt transforms use the paired snapshot text", async () => {
     const hooks = await plugin.server({ directory: root, worktree: root } as never)
 
     const systemOverride = await fs.readFile(path.join(process.cwd(), "src", "system.txt"), "utf8")
-    const systemSnapshotDir = path.join(process.cwd(), "src", "prompts", "_snapshots", "system")
+    const systemSnapshotDir = path.join(process.cwd(), "src", "_snapshots", "system")
     const systemSnapshots = (await fs.readdir(systemSnapshotDir, { withFileTypes: true })).filter(
       (entry) => entry.isFile() && entry.name.endsWith(".txt"),
     )
@@ -116,7 +130,7 @@ test("prompt transforms use the paired snapshot text", async () => {
       expect(systemOutput.system[0]).toBe(systemOverride)
     }
 
-    const skillSystemOverride = await fs.readFile(path.join(process.cwd(), "src", "prompts", "system", "skills.txt"), "utf8")
+    const skillSystemOverride = await fs.readFile(path.join(process.cwd(), "src", "skills.txt"), "utf8")
     const skillSystemOutput = {
       system: [`old intro\n<available_skills>\n  <skill>\n    <name>build</name>\n  </skill>\n</available_skills>`],
     }
@@ -136,26 +150,62 @@ test("prompt transforms use the paired snapshot text", async () => {
     )
 
     const agentSnapshot = await fs.readFile(
-      path.join(process.cwd(), "src", "prompts", "_snapshots", "agent", "explore.txt"),
+      path.join(process.cwd(), "src", "_snapshots", "agent", "explore.txt"),
       "utf8",
     )
-    const agentOverride = await fs.readFile(path.join(process.cwd(), "src", "prompts", "agent", "explore.txt"), "utf8")
+    const agentOverride = await fs.readFile(path.join(process.cwd(), "src", "agent", "explore.txt"), "utf8")
     const agentOutput = { system: [agentSnapshot] }
 
     await hooks["experimental.chat.system.transform"]({}, agentOutput as never)
 
     expect(agentOutput.system[0]).toBe(agentOverride)
 
+    const agentSnapshotDir = path.join(process.cwd(), "src", "_snapshots", "agent")
+    const agentSnapshotEntries = (await fs.readdir(agentSnapshotDir, { withFileTypes: true })).filter(
+      (entry) => entry.isFile() && entry.name.endsWith(".txt"),
+    )
+
+    for (const entry of agentSnapshotEntries) {
+      const name = path.basename(entry.name, ".txt")
+      const snapshot = await fs.readFile(path.join(agentSnapshotDir, entry.name), "utf8")
+      const override = await fs.readFile(path.join(process.cwd(), "src", "agent", `${name}.txt`), "utf8")
+      const output = { system: [snapshot] }
+
+      await hooks["experimental.chat.system.transform"]({}, output as never)
+
+      expect(output.system[0]).toBe(override)
+    }
+
     const sessionSnapshot = await fs.readFile(
-      path.join(process.cwd(), "src", "prompts", "_snapshots", "session", "build-switch.txt"),
+      path.join(process.cwd(), "src", "_snapshots", "session", "build-switch.txt"),
       "utf8",
     )
-    const sessionOverride = await fs.readFile(path.join(process.cwd(), "src", "prompts", "session", "build-switch.txt"), "utf8")
+    const sessionOverride = await fs.readFile(path.join(process.cwd(), "src", "build-switch.txt"), "utf8")
     const messages = { messages: [{ parts: [{ type: "text", text: sessionSnapshot }] }] }
 
     await hooks["experimental.chat.messages.transform"]({}, messages as never)
 
     expect(messages.messages[0].parts[0].text).toBe(sessionOverride)
+
+    const sessionSnapshotDir = path.join(process.cwd(), "src", "_snapshots", "session")
+    const sessionSnapshotEntries = (await fs.readdir(sessionSnapshotDir, { withFileTypes: true })).filter(
+      (entry) => entry.isFile() && entry.name.endsWith(".txt"),
+    )
+    const sessionSnapshotNames = new Set(sessionSnapshotEntries.map((entry) => path.basename(entry.name, ".txt")))
+    const sessionOverrideFiles = (await fs.readdir(path.join(process.cwd(), "src"))).filter(
+      (name) => name.endsWith(".txt") && sessionSnapshotNames.has(path.basename(name, ".txt")),
+    )
+
+    for (const name of sessionOverrideFiles) {
+      const base = path.basename(name, ".txt")
+      const snapshot = await fs.readFile(path.join(sessionSnapshotDir, `${base}.txt`), "utf8")
+      const override = await fs.readFile(path.join(process.cwd(), "src", name), "utf8")
+      const output = { messages: [{ parts: [{ type: "text", text: snapshot }] }] }
+
+      await hooks["experimental.chat.messages.transform"]({}, output as never)
+
+      expect(output.messages[0].parts[0].text).toBe(override)
+    }
   })
 })
 
@@ -195,17 +245,37 @@ test("build copies prompt and tool override files", async () => {
 
   expect(result.status).toBe(0)
 
-  const toolFiles = (await fs.readdir(path.join(process.cwd(), "src", "tools"))).filter((name) =>
+  const toolFiles = (await fs.readdir(path.join(process.cwd(), "src", "tool"))).filter((name) =>
     name.endsWith(".txt") || name.endsWith(".json"),
   )
 
   for (const name of toolFiles) {
-    const srcFile = await fs.readFile(path.join(process.cwd(), "src", "tools", name), "utf8")
-    const distFile = await fs.readFile(path.join(process.cwd(), "dist", "tools", name), "utf8")
+    const srcFile = await fs.readFile(path.join(process.cwd(), "src", "tool", name), "utf8")
+    const distFile = await fs.readFile(path.join(process.cwd(), "dist", "tool", name), "utf8")
     expect(distFile).toBe(srcFile)
   }
 
-  const srcSkills = await fs.readFile(path.join(process.cwd(), "src", "prompts", "system", "skills.txt"), "utf8")
-  const distSkills = await fs.readFile(path.join(process.cwd(), "dist", "prompts", "system", "skills.txt"), "utf8")
-  expect(distSkills).toBe(srcSkills)
+  const rootTextFiles = (await fs.readdir(path.join(process.cwd(), "src"))).filter((name) => name.endsWith(".txt"))
+
+  for (const name of rootTextFiles) {
+    const srcFile = await fs.readFile(path.join(process.cwd(), "src", name), "utf8")
+    const distFile = await fs.readFile(path.join(process.cwd(), "dist", name), "utf8")
+    expect(distFile).toBe(srcFile)
+  }
+
+  const snapshotDirs = await fs.readdir(path.join(process.cwd(), "src", "_snapshots"), { withFileTypes: true })
+
+  for (const entry of snapshotDirs) {
+    if (!entry.isDirectory()) continue
+
+    const srcSnapshotDir = path.join(process.cwd(), "src", "_snapshots", entry.name)
+    const distSnapshotDir = path.join(process.cwd(), "dist", "_snapshots", entry.name)
+    const snapshotFiles = (await fs.readdir(srcSnapshotDir)).filter((name) => name.endsWith(".txt"))
+
+    for (const name of snapshotFiles) {
+      const srcFile = await fs.readFile(path.join(srcSnapshotDir, name), "utf8")
+      const distFile = await fs.readFile(path.join(distSnapshotDir, name), "utf8")
+      expect(distFile).toBe(srcFile)
+    }
+  }
 }, { timeout: 30000 })

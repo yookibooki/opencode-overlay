@@ -1,0 +1,3 @@
+Use this tool when you have not yet started implementation and want to ask the user whether to switch into planning mode first.
+
+Call this tool before editing when the task is complex, needs research, or would benefit from a plan file.

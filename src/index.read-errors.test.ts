@@ -19,8 +19,8 @@ const expectedErrorCode = Bun.env.EXPECTED_ERROR_CODE ?? ""
 const checkCompactionUnset = Bun.env.CHECK_COMPACTION_UNSET === "1"
 
 const systemPath = ${JSON.stringify(path.join(process.cwd(), "src", "system.txt"))}
-const compactionPath = ${JSON.stringify(path.join(process.cwd(), "src", "prompts", "session", "compaction.txt"))}
-const skillsPath = ${JSON.stringify(path.join(process.cwd(), "src", "prompts", "system", "skills.txt"))}
+const compactionPath = ${JSON.stringify(path.join(process.cwd(), "src", "compaction.txt"))}
+const skillsPath = ${JSON.stringify(path.join(process.cwd(), "src", "skills.txt"))}
 
 mock.module("fs/promises", () => {
   const readFile = mock(async (filePath: string) => {

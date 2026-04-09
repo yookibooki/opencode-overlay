@@ -19,17 +19,17 @@ async function listPromptNames(dir: string) {
 
 test("prompt manifest tracks snapshot-paired local overrides", async () => {
   const root = process.cwd()
-  const promptsRoot = path.join(root, "src", "prompts")
+  const snapshotsRoot = path.join(root, "src", "_snapshots")
   const manifest = JSON.parse(
     await fs.readFile(path.join(root, "src", "prompts.manifest.json"), "utf8"),
   ) as PromptManifest
 
-  const [systemSnapshots, agentSnapshots, sessionSnapshots, agentOverrides, sessionOverrides] = await Promise.all([
-    listPromptNames(path.join(promptsRoot, "_snapshots", "system")),
-    listPromptNames(path.join(promptsRoot, "_snapshots", "agent")),
-    listPromptNames(path.join(promptsRoot, "_snapshots", "session")),
-    listPromptNames(path.join(promptsRoot, "agent")),
-    listPromptNames(path.join(promptsRoot, "session")),
+  const [systemSnapshots, agentSnapshots, sessionSnapshots, agentOverrides, rootOverrides] = await Promise.all([
+    listPromptNames(path.join(snapshotsRoot, "system")),
+    listPromptNames(path.join(snapshotsRoot, "agent")),
+    listPromptNames(path.join(snapshotsRoot, "session")),
+    listPromptNames(path.join(root, "src", "agent")),
+    listPromptNames(path.join(root, "src")),
   ])
 
   expect(systemSnapshots).toEqual(manifest.system)
@@ -41,7 +41,14 @@ test("prompt manifest tracks snapshot-paired local overrides", async () => {
     expect(manifest.agent).toContain(name)
   }
 
-  const namedSessionOverrides = sessionOverrides.filter((name) => name !== "compaction")
+  const namedSystemOverrides = rootOverrides.filter((name) => systemSnapshots.includes(name))
+
+  for (const name of namedSystemOverrides) {
+    expect(systemSnapshots).toContain(name)
+    expect(manifest.system).toContain(name)
+  }
+
+  const namedSessionOverrides = rootOverrides.filter((name) => sessionSnapshots.includes(name))
 
   for (const name of namedSessionOverrides) {
     expect(sessionSnapshots).toContain(name)

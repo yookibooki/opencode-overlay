@@ -1,5 +1,0 @@
-Run multiple independent tool actions together.
-
-Use when calls do not depend on each other.
-Prefer batching related reads, searches, or checks to reduce round trips.
-Do not batch steps that require previous outputs.

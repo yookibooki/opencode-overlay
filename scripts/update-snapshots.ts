@@ -26,7 +26,7 @@ const agentGeneratePath = `${upstreamBase}/agent/generate.txt`
 
 const systemNames = ["default", "anthropic", "gpt", "gemini", "codex", "beast", "kimi", "trinity"]
 const manifestPath = path.join(repoRoot, "src", "prompts.manifest.json")
-const snapshotRoot = path.join(repoRoot, "src", "prompts", "_snapshots")
+const snapshotRoot = path.join(repoRoot, "src", "_snapshots")
 
 async function fetchTree(): Promise<TreeEntry[]> {
   const url = `https://api.github.com/repos/${upstreamOwner}/${upstreamRepo}/git/trees/${upstreamRef}?recursive=1`

@@ -1,6 +1,7 @@
 import fs from "fs/promises"
 import path from "path"
 import { fileURLToPath } from "url"
+import { fromJSONSchema } from "zod"
 
 type PrefixPair = {
   builtin: string
@@ -9,7 +10,7 @@ type PrefixPair = {
 
 type ToolOverride = {
   description?: string
-  parameters?: Record<string, unknown>
+  parameters?: unknown
 }
 
 type DirEntryLike = {
@@ -56,15 +57,12 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 
 const root = path.dirname(fileURLToPath(import.meta.url))
 const systemPath = path.join(root, "system.txt")
-const promptsRoot = path.join(root, "prompts")
-const snapshotsRoot = path.join(promptsRoot, "_snapshots")
+const snapshotsRoot = path.join(root, "_snapshots")
 const snapshotSystemDir = path.join(snapshotsRoot, "system")
 const snapshotAgentDir = path.join(snapshotsRoot, "agent")
 const snapshotSessionDir = path.join(snapshotsRoot, "session")
-const agentOverridesDir = path.join(promptsRoot, "agent")
-const sessionOverridesDir = path.join(promptsRoot, "session")
-const systemOverridesDir = path.join(promptsRoot, "system")
-const toolsDir = path.join(root, "tools")
+const agentOverridesDir = path.join(root, "agent")
+const toolOverridesDir = path.join(root, "tool")
 const noSkillsMarker = "No skills are currently available."
 
 const skillSystemMarkers = ["<available_skills>", noSkillsMarker]
@@ -169,19 +167,19 @@ async function loadSharedPromptPairs(snapshotDir: string, sharedOverride: string
 
 async function loadToolOverrides() {
   const overrides = new Map<string, ToolOverride>()
-  const entries = await listFileBaseNames(toolsDir, [".txt", ".json"])
+  const entries = await listFileBaseNames(toolOverridesDir, [".txt", ".json"])
 
   await Promise.all(
     entries.map(async (name) => {
       const [description, schema] = await Promise.all([
-        readText(path.join(toolsDir, `${name}.txt`)),
-        readJsonObject(path.join(toolsDir, `${name}.json`)),
+        readText(path.join(toolOverridesDir, `${name}.txt`)),
+        readJsonObject(path.join(toolOverridesDir, `${name}.json`)),
       ])
 
       if (description === undefined && schema === undefined) return
       overrides.set(name, {
         ...(description !== undefined ? { description: description.trimEnd() } : {}),
-        ...(schema !== undefined ? { parameters: schema } : {}),
+        ...(schema !== undefined ? { parameters: fromJSONSchema(schema) } : {}),
       })
     }),
   )
@@ -208,6 +206,7 @@ export default {
   server: async (input?: ServerInput) => {
     const systemOverride = await readText(systemPath)
     const [
+      namedSystemPrefixPairs,
       systemPrefixPairs,
       agentPrefixPairs,
       sessionPrefixPairs,
@@ -215,14 +214,15 @@ export default {
       toolOverrides,
       skillSystemOverride,
     ] = await Promise.all([
+      loadNamedPromptPairs(snapshotSystemDir, root),
       loadSharedPromptPairs(snapshotSystemDir, systemOverride),
       loadNamedPromptPairs(snapshotAgentDir, agentOverridesDir),
-      loadNamedPromptPairs(snapshotSessionDir, sessionOverridesDir),
-      readText(path.join(sessionOverridesDir, "compaction.txt")),
+      loadNamedPromptPairs(snapshotSessionDir, root),
+      readText(path.join(root, "compaction.txt")),
       loadToolOverrides(),
-      readText(path.join(systemOverridesDir, "skills.txt")),
+      readText(path.join(root, "skills.txt")),
     ])
-    const chatPrefixPairs = sortByLengthDesc([...agentPrefixPairs, ...systemPrefixPairs])
+    const chatPrefixPairs = sortByLengthDesc([...agentPrefixPairs, ...namedSystemPrefixPairs, ...systemPrefixPairs])
 
     return {
       // Extend the built-in skill service with project-root folders.
