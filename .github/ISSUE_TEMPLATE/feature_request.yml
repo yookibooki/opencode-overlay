@@ -4,21 +4,35 @@ labels: [enhancement]
 body:
   - type: markdown
     attributes:
-      value: Please describe the change you want in terms of the override file that would hold it.
+      value: Please describe the change you want in terms of the file that would hold it.
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Scope
+      options:
+        - Prompt reduction
+        - Tool override
+        - Documentation
+        - Maintenance
+        - Other
+    validations:
+      required: true
   - type: textarea
     id: request
     attributes:
       label: Request
+      placeholder: What should change?
     validations:
       required: true
   - type: textarea
     id: rationale
     attributes:
       label: Why does this help?
+      placeholder: Describe the maintainer or collaboration benefit.
     validations:
       required: true
   - type: textarea
     id: file
     attributes:
       label: Suggested file or area
-      placeholder: src/agent/...
+      placeholder: src/agent/... or src/tool/...

@@ -2,6 +2,10 @@
 
 What changed, and why?
 
+## Related
+
+- [ ] Discussion or issue linked
+
 ## Validation
 
 - [ ] `bun run check`

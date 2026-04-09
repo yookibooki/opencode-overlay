@@ -1,5 +1,9 @@
 # OpenCode Overlay
 
+[![Discussions](https://img.shields.io/github/discussions/yookibooki/opencode-overlay?logo=github)](https://github.com/yookibooki/opencode-overlay/discussions)
+[![Issues](https://img.shields.io/github/issues/yookibooki/opencode-overlay?logo=github)](https://github.com/yookibooki/opencode-overlay/issues)
+[![License](https://img.shields.io/github/license/yookibooki/opencode-overlay)](LICENSE)
+
 Customize OpenCode's default context layer by editing plain text files.
 
 ## Setup
