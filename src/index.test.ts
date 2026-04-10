@@ -14,7 +14,7 @@ import plugin, {
 } from "./index"
 
 async function withTempDir<T>(fn: (root: string) => Promise<T>) {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), "opencode-thrifty-"))
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), "opencode-overlay-"))
 
   try {
     return await fn(root)

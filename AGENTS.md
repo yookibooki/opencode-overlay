@@ -1,6 +1,6 @@
 # AGENTS.md
 
-AI coding agent instructions for opencode-thrifty.
+AI coding agent instructions for opencode-overlay.
 
 ## What this project does
 
@@ -83,8 +83,7 @@ Keep overrides visible and file-based. Prefer an override file over hidden inter
 
 ## Reference (read-only)
 
-- OpenCode repo: `/home/dev/gitops/opencode/opencode`
+- OpenCode repo: `/home/dev/gitops/opencode`
 - Plugin docs: `/home/dev/gitops/opencode/packages/web/src/content/docs/plugins.mdx`
 
 ALWAYS READ REFERENCE FIRST.
-

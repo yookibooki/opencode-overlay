@@ -6,7 +6,7 @@ import path from "path"
 import plugin, { type PluginConfig } from "./index"
 
 async function withTempDir<T>(fn: (root: string) => Promise<T>) {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), "opencode-thrifty-skill-"))
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), "opencode-overlay-skill-"))
   try {
     return await fn(root)
   } finally {

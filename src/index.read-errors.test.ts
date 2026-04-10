@@ -6,7 +6,7 @@ import path from "path"
 import { pathToFileURL } from "url"
 
 async function runScenario(env: Record<string, string | undefined>) {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), "opencode-thrifty-read-errors-"))
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), "opencode-overlay-read-errors-"))
 
   try {
     const pluginUrl = `${pathToFileURL(path.join(process.cwd(), "src", "index.ts")).href}?read-errors`

@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "opencode-thrifty",
+      "name": "opencode-overlay",
       "dependencies": {
         "zod": "^4.3.6",
       },

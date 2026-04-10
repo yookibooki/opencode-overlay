@@ -39,7 +39,7 @@ async function fetchTree(): Promise<TreeEntry[]> {
   const response = await fetch(url, {
     headers: {
       Accept: "application/vnd.github+json",
-      "User-Agent": "opencode-thrifty",
+      "User-Agent": "opencode-overlay",
     },
   })
 
@@ -59,7 +59,7 @@ async function fetchText(filePath: string) {
   const url = `https://raw.githubusercontent.com/${upstreamOwner}/${upstreamRepo}/${upstreamRef}/${filePath}`
   const response = await fetch(url, {
     headers: {
-      "User-Agent": "opencode-thrifty",
+      "User-Agent": "opencode-overlay",
     },
   })
 

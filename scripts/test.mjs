@@ -36,13 +36,13 @@ async function runLivePromptCheck() {
     process.exit(buildResult.status ?? 1)
   }
 
-  const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "opencode-thrifty-live-"))
+  const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "opencode-overlay-live-"))
 
   try {
     const pluginDir = path.join(tempRoot, ".opencode", "plugins")
 
     await fs.mkdir(pluginDir, { recursive: true })
-    await fs.copyFile(path.join(distRoot, "index.js"), path.join(pluginDir, "opencode-thrifty.js"))
+    await fs.copyFile(path.join(distRoot, "index.js"), path.join(pluginDir, "opencode-overlay.js"))
     await copyRootTextFiles(distRoot, pluginDir)
     await copyTree(path.join(distRoot, "agent"), path.join(pluginDir, "agent"))
     await copyTree(path.join(distRoot, "tool"), path.join(pluginDir, "tool"))

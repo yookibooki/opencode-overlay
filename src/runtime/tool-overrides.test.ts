@@ -7,7 +7,7 @@ import { toJSONSchema } from "zod"
 import { loadToolOverrides } from "./tool-overrides"
 
 async function withTempDir<T>(fn: (root: string) => Promise<T>) {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), "opencode-thrifty-tools-"))
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), "opencode-overlay-tools-"))
 
   try {
     return await fn(root)

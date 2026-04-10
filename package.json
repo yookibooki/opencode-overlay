@@ -1,7 +1,8 @@
 {
-  "name": "opencode-thrifty",
-  "version": "0.0.5",
+  "name": "opencode-overlay",
+  "version": "0.0.8",
   "type": "module",
+  "packageManager": "bun@1.3.11",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
@@ -29,6 +30,14 @@
     "opencode-plugin"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yookibooki/opencode-overlay.git"
+  },
+  "homepage": "https://github.com/yookibooki/opencode-overlay#readme",
+  "bugs": {
+    "url": "https://github.com/yookibooki/opencode-overlay/issues"
+  },
   "description": "OpenCode prompt and tool description overrides",
   "dependencies": {
     "zod": "^4.3.6"

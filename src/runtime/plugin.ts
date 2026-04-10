@@ -136,7 +136,7 @@ export function createPlugin(root: string): PluginDefinition {
   const loaded = loadPromptOverridePairs(paths)
 
   return {
-    id: "opencode-thrifty",
+    id: "opencode-overlay",
     server: async (input?: ServerInput) => {
       return createHooks(input, await loaded)
     },
