@@ -1,37 +1,25 @@
 ---
-layout: home
-title: opencode-overlay
-description: File-based OpenCode overrides for prompts, agents, and tools.
-hero:
-  name: opencode-overlay
-  text: OpenCode overlay.
-  tagline: Edit `.txt` files.
-  actions:
-    - theme: brand
-      text: Quick Start
-      link: /quick-start
-    - theme: alt
-      text: Reference
-      link: /reference
-features:
-  - icon: ⚡
-    title: File-based
-    details: Plain `.txt` files.
-  - icon: 🔎
-    title: Search
-    details: Local search.
+title: Quick Start
+description: Install and customize OpenCode overlay.
 ---
 
-## At a glance
+# Quick Start
 
 ```bash
-bun install
-bun run build
-bun run docs:dev
+opencode plugin opencode-overlay --global
 ```
 
-## What you customize
+## Customize
 
-- `src/model.txt`
-- `src/agent/*.txt`
-- `src/tool/*.txt`
+Clone the repo:
+
+```bash
+git clone --depth 1 https://github.com/yookibooki/opencode-overlay
+cd opencode-overlay
+```
+
+Edit the `.txt` files.
+
+```bash
+bun install && bun run build && opencode plugin "$(pwd)" --global
+```
