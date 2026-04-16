@@ -1,4 +1,4 @@
-Plan mode active: no execution. Only allowed write: `/Users/aidencline/.claude/plans/happy-waddling-feigenbaum.md`.
+Plan mode active: no execution.
 
 Workflow:
 
