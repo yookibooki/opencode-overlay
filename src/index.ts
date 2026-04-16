@@ -34,23 +34,25 @@ const messageRewrites = [...rootPairs]
 
 const plugin = {
   id: "opencode-overlay",
-  server: () => ({
-    "experimental.chat.system.transform": (_input: unknown, output: SystemTransformOutput) => {
-      rewriteStringsInPlace(output.system, systemRewrites)
-    },
-    "experimental.chat.messages.transform": (_input: unknown, output: MessagesTransformOutput) => {
-      for (const message of output.messages) {
-        for (const part of message.parts) {
-          if (part.type !== "text") continue
-          part.text = rewriteByPrefix(part.text, messageRewrites)
+  server() {
+    return {
+      "experimental.chat.system.transform"(_input: unknown, output: SystemTransformOutput): void {
+        rewriteStringsInPlace(output.system, systemRewrites)
+      },
+      "experimental.chat.messages.transform"(_input: unknown, output: MessagesTransformOutput): void {
+        for (const message of output.messages) {
+          for (const part of message.parts) {
+            if (part.type !== "text") continue
+            part.text = rewriteByPrefix(part.text, messageRewrites)
+          }
         }
-      }
-    },
-    "tool.definition": ({ toolID }: { toolID: string }, output: ToolDefinitionOutput) => {
-      const override = tools.get(normalizeToolId(toolID))
-      if (override !== undefined) output.description = override
-    },
-  }),
+      },
+      "tool.definition"({ toolID }: { toolID: string }, output: ToolDefinitionOutput): void {
+        const override = tools.get(normalizeToolId(toolID))
+        if (override !== undefined) output.description = override
+      },
+    }
+  },
 }
 
 export default plugin
