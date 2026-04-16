@@ -4,7 +4,7 @@ const isGitHubPagesBuild = process.env.GITHUB_ACTIONS === "true"
 
 export default defineConfig({
   title: "opencode-overlay",
-  description: "OpenCode plugin for customizing system prompts and tool definitions.",
+  description: "OpenCode overlay for prompts and tools.",
   base: isGitHubPagesBuild ? "/opencode-overlay/" : "/",
   cleanUrls: true,
   lastUpdated: true,
@@ -13,7 +13,7 @@ export default defineConfig({
     nav: [
       { text: "Home", link: "/" },
       { text: "Quick Start", link: "/quick-start" },
-      { text: "API", link: "/api" },
+      { text: "Reference", link: "/reference" },
     ],
     sidebar: [
       {
@@ -22,14 +22,14 @@ export default defineConfig({
       },
       {
         text: "Reference",
-        items: [{ text: "API", link: "/api" }],
+        items: [{ text: "Reference", link: "/reference" }],
       },
     ],
     outline: { level: [2, 3], label: "On this page" },
     search: { provider: "local" },
     socialLinks: [{ icon: "github", link: "https://github.com/yookibooki/opencode-overlay" }],
     footer: {
-      message: "File-based OpenCode overlays.",
+      message: "OpenCode overlay.",
       copyright: "MIT License",
     },
   },

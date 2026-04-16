@@ -1,5 +1,3 @@
-# opencode-overlay
-
 OpenCode plugin for customizing system prompts and tool definitions.
 
 ## Setup
@@ -52,8 +50,6 @@ Step 2: edit `.txt` files
     ├── websearch.txt
     └── write.txt
 ```
-
-Supporting code: `src/overlay-helpers.ts`, `scripts/build-helpers.ts`, and `test/`.
 
 Step 3: install:
 ```bash

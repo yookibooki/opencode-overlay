@@ -1,48 +1,26 @@
 ---
 layout: home
 title: opencode-overlay
-description: File-based OpenCode prompt and tool overrides.
+description: File-based OpenCode overrides for prompts, agents, and tools.
 hero:
   name: opencode-overlay
-  text: OpenCode docs, but cleaner.
-  tagline: A minimal, file-based way to customize prompts, agents, and tool definitions.
+  text: OpenCode overlay.
+  tagline: Edit `.txt` files.
   actions:
     - theme: brand
       text: Quick Start
       link: /quick-start
     - theme: alt
-      text: API Reference
-      link: /api
+      text: Reference
+      link: /reference
 features:
   - icon: ⚡
     title: File-based
-    details: Keep all overrides in plain .txt files with predictable names.
-  - icon: 🌗
-    title: Day / night
-    details: Built-in appearance switch with a polished docs theme.
+    details: Plain `.txt` files.
   - icon: 🔎
     title: Search
-    details: Local search works out of the box on GitHub Pages.
+    details: Local search.
 ---
-
-## Why this exists
-
-`opencode-overlay` keeps OpenCode customization simple: edit text files, build once, and publish.
-
-<div class="landing-grid">
-  <div class="landing-card">
-    <h3>Fast to understand</h3>
-    <p>Docs map directly to the plugin’s on-disk structure.</p>
-  </div>
-  <div class="landing-card">
-    <h3>Easy to deploy</h3>
-    <p>GitHub Pages hosts the docs site; the plugin ships from the repo.</p>
-  </div>
-  <div class="landing-card">
-    <h3>Minimal code</h3>
-    <p>Most behavior lives in a small build pipeline and a few helpers.</p>
-  </div>
-</div>
 
 ## At a glance
 
@@ -54,7 +32,6 @@ bun run docs:dev
 
 ## What you customize
 
-- `src/model.txt` for model-specific system guidance
-- `src/agent/*.txt` for agent prompts
-- `src/tool/*.txt` for tool descriptions
-- `docs/` for this website
+- `src/model.txt`
+- `src/agent/*.txt`
+- `src/tool/*.txt`

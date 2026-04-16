@@ -1,6 +1,6 @@
 ---
 title: Quick Start
-description: Install, customize, and publish opencode-overlay.
+description: Install and customize opencode-overlay.
 ---
 
 # Quick Start
@@ -13,7 +13,7 @@ opencode plugin opencode-overlay --global
 
 ## 2. Customize
 
-Clone the repo and edit the overlay files:
+Clone the repo:
 
 ```bash
 git clone --depth 1 https://github.com/yookibooki/opencode-overlay
@@ -60,12 +60,6 @@ bun install
 bun run build
 ```
 
-## 4. Publish the docs
+## 4. Publish
 
-The docs site is built with VitePress and deployed to GitHub Pages from `.github/workflows/pages.yml`.
-
-## Notes
-
-- Search is local.
-- Theme switching is built in.
-- The site is designed to stay simple, fast, and easy to maintain.
+The docs site deploys from `.github/workflows/pages.yml`.
