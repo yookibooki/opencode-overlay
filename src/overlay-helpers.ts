@@ -69,13 +69,23 @@ export const loadTools = async (toolDir: string) => {
   const names = (await fs.readdir(toolDir)).filter((name) => name.endsWith(".txt")).sort()
   if (names.length === 0) throw new Error(`No .txt tool definitions found in ${toolDir}`)
   const entries = await Promise.all(
-    names.map(async (name) => [
-      normalizeToolId(path.basename(name, ".txt")),
-      (await fs.readFile(path.join(toolDir, name), "utf8")).trimEnd(),
-    ] as const),
+    names.map(async (name) => ({
+      id: normalizeToolId(path.basename(name, ".txt")),
+      description: (await fs.readFile(path.join(toolDir, name), "utf8")).trimEnd(),
+      name,
+    })),
   )
 
-  return new Map(entries)
+  const tools = new Map<string, string>()
+  for (const { id, description, name } of entries) {
+    if (tools.has(id)) {
+      throw new Error(`Duplicate tool override for normalized id "${id}" from ${name}`)
+    }
+
+    tools.set(id, description)
+  }
+
+  return tools
 }
 
 export const rewriteByPrefix = (text: string, pairs: readonly PrefixPair[]) => {

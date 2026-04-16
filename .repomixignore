@@ -1,0 +1,6 @@
+# Generated output and local dependencies
+node_modules/
+dist/
+.cache/
+docs/.vitepress/dist/
+repomix-output.xml

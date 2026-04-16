@@ -7,8 +7,8 @@ hero:
   tagline: File-based overrides for models, agents, and tools
   actions:
     - theme: brand
-      text: Getting Started
-      link: /getting-started
+      text: Quick Start
+      link: /quick-start
     - theme: alt
       text: API
       link: /api
