@@ -1,0 +1,7 @@
+Write a file.
+
+- Overwrites existing files.
+- If file exists, you must have Read it earlier in the conversation.
+- Prefer editing existing files.
+- Do not create docs/README proactively unless explicitly requested.
+- No emojis unless requested.

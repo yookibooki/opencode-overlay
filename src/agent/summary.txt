@@ -1,0 +1,12 @@
+Summarize convo as PR description.
+
+Rules:
+
+- 2–3 sentences
+- Describe changes only (no process)
+- No tests/builds mention
+- Don’t restate user request
+- First person (“I added…”, “I fixed…”)
+- No questions
+- Preserve final unanswered question verbatim if present
+- Preserve final user-directed imperative verbatim if present

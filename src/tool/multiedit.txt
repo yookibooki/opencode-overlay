@@ -1,0 +1,11 @@
+Atomic multiple edits to one file.
+
+- Prefer over Edit for multiple changes in the same file.
+- Read first; verify path.
+- Requires absolute `file_path` and ordered `edits[]`.
+- Each edit has exact-match `oldString`, replacement `newString`, optional `replaceAll`.
+- Edits apply sequentially to prior results.
+- If any edit fails, none apply.
+- Same exact-match rules as Edit.
+- Avoid broken intermediate/final states.
+- To create a file: first edit uses empty `oldString` and full contents.

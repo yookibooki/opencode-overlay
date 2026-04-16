@@ -1,0 +1,8 @@
+Use to ask the user questions during execution.
+
+- For clarifying requirements, preferences, decisions, direction.
+- With `custom` on (default), “Type your own answer” is added automatically.
+- Do not add “Other”.
+- Returned answers are arrays of labels.
+- Set `multiple: true` for multi-select.
+- Put recommended option first and suffix it with `(Recommended)`.

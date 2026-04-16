@@ -1,0 +1,20 @@
+Launch a subagent for complex autonomous work.
+
+- Must set `subagent_type`.
+
+Use when:
+- Executing custom slash commands: pass the full slash command as the prompt.
+
+Do not use when:
+- Reading a known file
+- Looking for a specific class definition
+- Searching within 2–3 known files
+- The task does not match an agent description
+
+Notes:
+- Parallelize multiple agents when possible.
+- Each run returns one message plus `task_id`.
+- Reuse `task_id` to continue the same session.
+- Fresh sessions need a detailed prompt describing task, expected output, whether to write code or only research, and how to verify.
+- Agent outputs are generally trustworthy.
+- Use proactively if the agent description says so.

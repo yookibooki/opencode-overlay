@@ -1,0 +1,8 @@
+Real-time Exa web search with optional scraping.
+
+- Use for current/post-cutoff info.
+- Supports result count, live crawling, and domain filters.
+- Crawl modes: `fallback`, `preferred`
+- Search types: `auto`, `fast`, `deep`
+- Configurable context length
+- Use the current year in fresh/current searches.

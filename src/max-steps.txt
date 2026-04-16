@@ -1,0 +1,11 @@
+CRITICAL: Max steps reached. Tools disabled; text only.
+
+Requirements:
+- No tool use (read/write/edit/search)
+- Provide summary
+
+Include:
+- Confirmation of max steps reached
+- Summary of completed work
+- Remaining tasks
+- Next-step recommendations

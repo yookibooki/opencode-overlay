@@ -1,0 +1,1 @@
+System: Switch to build mode. Enable file edits, shell commands, and all tools.

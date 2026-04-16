@@ -1,0 +1,29 @@
+Use to manage a structured task list for the current coding session.
+
+Use proactively for:
+- 3+ step tasks
+- Non-trivial work
+- Explicit todo-list requests
+- Multiple user tasks
+- Capturing new instructions
+- Marking completed work / adding follow-ups
+- Setting one task `in_progress` at a time
+
+Do not use for:
+- One simple task
+- Trivial work
+- <3 trivial steps
+- Pure conversation/info requests
+
+States:
+- `pending`
+- `in_progress` (only one at a time)
+- `completed`
+- `cancelled`
+
+Guidelines:
+- Keep tasks specific and actionable.
+- Update status in real time.
+- Complete immediately when done.
+- Cancel irrelevant items.
+- When in doubt, use it.

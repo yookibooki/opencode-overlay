@@ -1,0 +1,50 @@
+{
+  "name": "opencode-overlay",
+  "version": "0.0.29",
+  "type": "module",
+  "packageManager": "bun@1.3.11",
+  "description": "OpenCode plugin for customizing system prompts and tool definitions.",
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "opencode-overlay",
+    "prompt-overrides",
+    "prompt-customization",
+    "tool-definitions",
+    "system-prompts",
+    "agent-prompts"
+  ],
+  "homepage": "https://yookibooki.github.io/opencode-overlay/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yookibooki/opencode-overlay.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yookibooki/opencode-overlay/issues"
+  },
+  "main": "./dist/index.js",
+  "files": ["dist"],
+  "scripts": {
+    "build": "bun run scripts/build.mjs",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "lint": "bunx eslint .",
+    "lint:fix": "bunx eslint . --fix",
+    "test": "bun test",
+    "check": "bun run lint && bun run build",
+    "prepublishOnly": "bun run build"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@eslint/css": "^1.1.0",
+    "@eslint/js": "^10.0.1",
+    "@eslint/json": "^1.2.0",
+    "@eslint/markdown": "^8.0.1",
+    "eslint": "^10.2.0",
+    "globals": "^17.5.0",
+    "jiti": "^2.6.1",
+    "typescript-eslint": "^8.58.2",
+    "vitepress": "^2.0.0-alpha.17"
+  }
+}

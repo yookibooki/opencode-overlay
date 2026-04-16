@@ -1,0 +1,5 @@
+Use when planning is complete and ready for implementation.
+
+- Call after the plan is written/finalized and questions are resolved.
+- Do not call before the plan is ready or while planning continues.
+- It asks whether to switch to the build agent.

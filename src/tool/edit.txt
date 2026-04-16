@@ -1,0 +1,8 @@
+Exact string replace in a file.
+
+- Must have used Read earlier in the conversation.
+- Match exact file text, excluding line-number prefixes.
+- Preserve exact indentation/whitespace.
+- Prefer editing existing files.
+- Fails if `oldString` missing.
+- Fails on multiple matches unless you add context or use `replaceAll`.

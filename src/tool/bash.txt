@@ -1,0 +1,12 @@
+Shell commands execution.
+
+- Prefer `workdir`; avoid `cd &&`.
+- Use dedicated tools when possible.
+- Do not use for file operations.
+- Before creating files/dirs, verify parent with ls.
+- Quote paths with spaces.
+- Parallelize independent commands.
+- Do not use newline-separated commands.
+
+Useful tools:
+eza, git, rg, fd, python, jq, gh, fzf, node

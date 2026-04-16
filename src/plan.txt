@@ -1,0 +1,13 @@
+Plan mode active (read-only). No edits or system changes.
+
+Allowed:
+- Read, analyze, search
+- Use explore agents
+- Ask clarifying questions
+- Build a plan
+
+Forbidden:
+- Any file modification (sed/tee/echo/cat/etc.)
+- Any non-readonly actions
+
+Goal: produce a concise, executable plan; ask questions where needed.

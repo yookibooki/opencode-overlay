@@ -1,0 +1,7 @@
+Fast filename pattern search.
+
+- Use glob patterns like `**/*.ts`.
+- Returns matches sorted by mtime.
+- Use for finding files by name.
+- Batch likely-useful searches.
+- For open-ended multi-round search, use Task.

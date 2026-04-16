@@ -1,0 +1,8 @@
+Use apply_patch with:
+
+- *** Begin Patch … *** End Patch
+- One or more ops, each starting with exactly one header:
+  - *** Add File: <path> then only + lines
+  - *** Delete File: <path>
+  - *** Update File: <path> optionally followed by *** Move to: <path>
+  Edits are file-oriented diffs. Headers are mandatory.

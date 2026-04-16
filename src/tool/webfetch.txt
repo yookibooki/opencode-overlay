@@ -1,0 +1,9 @@
+Fetch content from a URL.
+
+- Input: URL, optional format.
+- Formats: `markdown` (default), `text`, `html`.
+- Read-only.
+- Prefer a better web-fetching tool if one exists.
+- URL must be valid and fully formed.
+- HTTP auto-upgrades to HTTPS.
+- Large results may be summarized.

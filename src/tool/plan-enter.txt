@@ -1,0 +1,6 @@
+Use when planning first would help.
+
+- Always call if user explicitly asks for a plan.
+- Good for complex, multi-file, or architecture-heavy work.
+- Do not call for simple tasks or when user wants immediate implementation.
+- It asks whether to switch to the plan agent.

@@ -1,0 +1,13 @@
+Read a file or directory.
+
+- `filePath` must be absolute.
+- Default: up to 2000 lines from start.
+- Use `offset` (1-based) for later sections.
+- Use Glob if path is unknown.
+- Use Grep for large files/specific content.
+- File lines are returned as `<line>: <content>`.
+- Directory entries are one per line; subdirs end with `/`.
+- Long lines are truncated.
+- Read multiple known files in parallel.
+- Avoid tiny repeated windows.
+- Can read images/PDFs and return them as attachments.

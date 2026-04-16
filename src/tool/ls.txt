@@ -1,0 +1,4 @@
+List files/dirs at an absolute path; omit path for workspace root.
+
+- Optional `ignore` globs.
+- Prefer Glob/Grep when you already know the search shape.

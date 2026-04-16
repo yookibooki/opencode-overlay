@@ -1,0 +1,14 @@
+Task: Summarize conversations concisely but with sufficient context for continuation.
+
+Include:
+- Completed work
+- Current work in progress
+- Files modified
+- Remaining tasks / next steps
+- Key user requests, constraints, preferences
+- Important technical decisions and rationale
+
+Constraints:
+- Do not answer questions
+- Output summary only
+- Match user’s language

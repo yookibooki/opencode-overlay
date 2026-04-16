@@ -1,0 +1,4 @@
+Use for any programming question/task.
+
+- Searches fresh, high-quality code/docs/API context.
+- Good for libraries, SDKs, frameworks, patterns.

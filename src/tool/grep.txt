@@ -1,0 +1,8 @@
+Fast regex content search.
+
+- Supports full regex.
+- Can filter by file pattern via `include`.
+- Returns matching file paths + line numbers sorted by mtime.
+- Use for finding files containing patterns.
+- If you need counts, use Bash with `rg`, not Grep.
+- For open-ended multi-round search, use Task.
