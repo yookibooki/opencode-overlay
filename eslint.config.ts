@@ -9,7 +9,6 @@ import { defineConfig } from "eslint/config";
 export default defineConfig([
   {
     ignores: [
-      ".agents/**",
       "docs/.vitepress/dist/**",
       "docs/.vitepress/cache/**",
       "package-lock.json",

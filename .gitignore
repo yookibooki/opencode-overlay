@@ -1,12 +1,7 @@
 dist/
 node_modules/
 .cache/
-.agents
-.claude
-skills-lock.json
 docs/_site/
 docs/.jekyll-cache/
 docs/.vitepress/dist/
 docs/.vitepress/cache/
-repomix-output.xml
-.opencode
