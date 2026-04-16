@@ -18,7 +18,8 @@
   }
 
   const promptDir = path.posix.join(upstream.srcRoot, "session/prompt")
-  const agentDir = path.posix.join(upstream.srcRoot, "agent")
+  const agentPromptDir = path.posix.join(upstream.srcRoot, "agent/prompt")
+  const promptAgentStems = new Set(["compaction", "explore", "summary", "title"])
 
   const refDir = path.join(distDir, "_refs")
   const modelRefDir = path.join(refDir, "model")
@@ -194,7 +195,8 @@
 
     const agentRefs = agentNames.map((name) => {
       const stem = path.basename(name, ".txt")
-      const remotePath = findRemoteTxt(tree.tree, agentDir, stem)
+      const remoteDir = promptAgentStems.has(stem) ? agentPromptDir : path.posix.join(upstream.srcRoot, "agent")
+      const remotePath = findRemoteTxt(tree.tree, remoteDir, stem)
 
       if (!remotePath) throw new Error(`Missing upstream agent prompt for ${name}`)
       return { refName: stem, remotePath }

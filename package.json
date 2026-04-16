@@ -1,6 +1,6 @@
 {
   "name": "opencode-overlay",
-  "version": "0.0.29",
+  "version": "0.0.30",
   "type": "module",
   "packageManager": "bun@1.3.11",
   "description": "OpenCode plugin for customizing system prompts and tool definitions.",

@@ -29,8 +29,8 @@ const [tools, modelPairs, rootPairs, agentPairs] = await Promise.all([
   loadPrefixPairs(path.join(refDir, "agent"), agentDir),
 ])
 
-const systemRewrites = [...modelPairs, ...rootPairs]
-const messageRewrites = [...rootPairs, ...agentPairs]
+const systemRewrites = [...modelPairs, ...rootPairs, ...agentPairs]
+const messageRewrites = [...rootPairs]
 
 const plugin = {
   id: "opencode-overlay",
