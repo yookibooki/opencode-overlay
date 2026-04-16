@@ -1,20 +1,24 @@
-## Quick Start
+---
+title: Quick Start
+description: Install, customize, and publish opencode-overlay.
+---
 
-### Option 1: use it with my prompts
+# Quick Start
+
+## 1. Install
 
 ```bash
 opencode plugin opencode-overlay --global
 ```
 
-### Option 2: customize
+## 2. Customize
 
-Step 1: clone this repo:
+Clone the repo and edit the overlay files:
 
 ```bash
-git clone --depth 1 https://github.com/yookibooki/opencode-overlay && cd opencode-overlay
+git clone --depth 1 https://github.com/yookibooki/opencode-overlay
+cd opencode-overlay
 ```
-
-Step 2: edit `.txt` files
 
 ```text
 ├── agent/
@@ -49,9 +53,19 @@ Step 2: edit `.txt` files
     └── write.txt
 ```
 
-Supporting code: `src/overlay-helpers.ts`, `scripts/build-helpers.ts`, and `test/`.
+## 3. Build
 
-Step 3: install:
 ```bash
-bun install && bun run build && opencode plugin "$(pwd)" --global
+bun install
+bun run build
 ```
+
+## 4. Publish the docs
+
+The docs site is built with VitePress and deployed to GitHub Pages from `.github/workflows/pages.yml`.
+
+## Notes
+
+- Search is local.
+- Theme switching is built in.
+- The site is designed to stay simple, fast, and easy to maintain.
